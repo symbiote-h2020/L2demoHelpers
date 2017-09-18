@@ -5,5 +5,7 @@
 .idea/inspectionProfiles/
 .idea/sonarlint/
 .idea/workspace.xml
-src/
 /L2demoHelpers.iml
+/src/main/main.iml
+/src/test/test.iml
+/.idea/
