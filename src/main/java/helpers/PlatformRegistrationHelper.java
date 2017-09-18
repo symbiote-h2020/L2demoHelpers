@@ -3,6 +3,7 @@ package helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.RpcClient;
+import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
 import eu.h2020.symbiote.security.commons.enums.OperationType;
 import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.*;
@@ -24,27 +25,46 @@ public class PlatformRegistrationHelper {
     public static void main(String[] args) {
         //TODO: fill all the proper fields
 
-        registerPlatformOwner();
-
         String AAMOwnerUsername = "";
         String AAMOwnerPassword = "";
-        String platformId = "";
-        String platformOwnerUsername = "";
-        String platformOwnerPassword = "";
-        String platformInstanceFriendlyName = "";
-        String platformInterworkingInterfaceAddress = "";
+        String username = "";
+        String password = "";
+        String federatedId = "";
+        String recoveryMail = "";
 
         String rabbitHost = "";
         String rabbitUsername = "";
         String rabbitPassword = "";
+        String userManagementRequestQueue = "";
+
+        try {
+            registerPlatformOwner(AAMOwnerUsername,
+                    AAMOwnerPassword,
+                    username,
+                    password,
+                    federatedId,
+                    recoveryMail,
+                    rabbitHost,
+                    rabbitUsername,
+                    rabbitPassword,
+                    userManagementRequestQueue);
+        } catch (IOException | TimeoutException e) {
+            log.error(e.getMessage());
+            log.error(e.getCause());
+        }
+
+        String platformId = "";
+        String platformInstanceFriendlyName = "";
+        String platformInterworkingInterfaceAddress = "";
+
         String platformManagementRequestQueue = "";
 
         try {
             registerPlatform(AAMOwnerUsername,
                     AAMOwnerPassword,
                     platformId,
-                    platformOwnerUsername,
-                    platformOwnerPassword,
+                    username,
+                    password,
                     platformInstanceFriendlyName,
                     platformInterworkingInterfaceAddress,
                     rabbitHost,
@@ -83,24 +103,17 @@ public class PlatformRegistrationHelper {
         if (response == null) {
             throw new SecurityException("Platform not registered.");
         }
+        ErrorResponseContainer errorResponseContainer = mapper.readValue(response, ErrorResponseContainer.class);
+        log.info(errorResponseContainer.getErrorMessage());
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
 
         return platformRegistrationOverAMQPResponse;
     }
 
-    public static void registerPlatformOwner() {
-        String AAMOwnerUsername = "AAMOwner";
-        String AAMOwnerPassword = "AAMOwner";
-        String username = "testPOUsername";
-        String password = "testPOpassword";
-        String federatedId = "testPOFederatedId";
-        String recoveryMail = "testRecoveryMail";
-
-        String rabbitHost = "localhost";
-        String rabbitUsername = "guest";
-        String rabbitPassword = "guest";
-        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
+    public static ManagementStatus registerPlatformOwner(String AAMOwnerUsername, String AAMOwnerPassword, String username, String password,
+                                                         String federatedId, String recoveryMail, String rabbitHost, String rabbitUsername,
+                                                         String rabbitPassword, String userManagementRequestQueue) throws IOException, TimeoutException {
 
         Connection connection = null;
         RpcClient userManagementOverAMQPClient = null;
@@ -117,12 +130,11 @@ public class PlatformRegistrationHelper {
                 new UserDetails(new Credentials(username, password), federatedId, recoveryMail,
                         UserRole.PLATFORM_OWNER, new HashMap<>(), new HashMap<>()), OperationType.CREATE);
 
-        try {
-            byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
+        byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                     (userManagementRequest).getBytes());
-        } catch (IOException | TimeoutException e) {
-            log.error("Communication failed");
-        }
+
+        ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
+        return managementStatus;
     }
 
 

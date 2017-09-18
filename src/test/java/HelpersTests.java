@@ -1,5 +1,4 @@
 import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
-import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
 import eu.h2020.symbiote.security.communication.payloads.PlatformManagementResponse;
 import helpers.FederationRegistrationHelper;
@@ -55,10 +54,9 @@ public class HelpersTests {
     @Test
     public void UserRegistrationHelperTest() throws IOException, TimeoutException {
         String AAMOwnerUsername = "AAMOwner";
-        String AAMOwnerUsername = "AAMOwner";
         String AAMOwnerPassword = "AAMPassword";
-        String username = "testPOUsername";
-        String password = "testPOPassword";
+        String username = "testUsername";
+        String password = "testPassword";
         String federatedId = "testFederatedId";
         String recoveryMail = "null@dev.null";
 
@@ -93,10 +91,27 @@ public class HelpersTests {
         String platformInstanceFriendlyName = "testPlatformInstanceFriendlyName";
         String platformInterworkingInterfaceAddress = "testPlatformInterworkingInterfaceAddress";
 
+        String federatedId = "testFederatedId";
+        String recoveryMail = "null@dev.null";
+        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
+
         String rabbitHost = "localhost";
         String rabbitUsername = "guest";
         String rabbitPassword = "guest";
         String platformManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_platform_request";
+
+        ManagementStatus userResponse = PlatformRegistrationHelper.registerPlatformOwner(
+                AAMOwnerUsername,
+                AAMOwnerPassword,
+                platformOwnerUsername,
+                platformOwnerPassword,
+                federatedId,
+                recoveryMail,
+                rabbitHost,
+                rabbitUsername,
+                rabbitPassword,
+                userManagementRequestQueue
+        );
 
         PlatformManagementResponse response = PlatformRegistrationHelper.registerPlatform(
                 AAMOwnerUsername,
@@ -110,6 +125,7 @@ public class HelpersTests {
                 rabbitUsername,
                 rabbitPassword,
                 platformManagementRequestQueue);
+
 
         assertEquals(ManagementStatus.OK, response.getRegistrationStatus());
         assertEquals(platformId, response.getPlatformId());
