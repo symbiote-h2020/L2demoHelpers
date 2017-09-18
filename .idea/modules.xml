@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/L2demoHelpers.iml" filepath="$PROJECT_DIR$/L2demoHelpers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2demoHelpers.iml" filepath="$PROJECT_DIR$/.idea/modules/L2demoHelpers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2demoHelpers_main.iml" filepath="$PROJECT_DIR$/.idea/modules/L2demoHelpers_main.iml" group="L2demoHelpers" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2demoHelpers_test.iml" filepath="$PROJECT_DIR$/.idea/modules/L2demoHelpers_test.iml" group="L2demoHelpers" />
       <module fileurl="file://$PROJECT_DIR$/src/main/main.iml" filepath="$PROJECT_DIR$/src/main/main.iml" />
       <module fileurl="file://$PROJECT_DIR$/src/test/test.iml" filepath="$PROJECT_DIR$/src/test/test.iml" />
     </modules>
