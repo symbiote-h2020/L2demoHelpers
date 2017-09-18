@@ -1,18 +1,27 @@
+import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
+import eu.h2020.symbiote.security.communication.payloads.PlatformManagementResponse;
 import helpers.FederationRegistrationHelper;
+import helpers.PlatformRegistrationHelper;
+import helpers.UserRegistrationHelper;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class HelpersTests {
+
+    @Before
+    public void setUp() {
+    }
 
     @Test
     public void FederationRegistrationHelperTest() throws IOException, TimeoutException {
@@ -41,4 +50,69 @@ public class HelpersTests {
 
         assertTrue(responseMap.containsKey(federationId));
     }
+
+    @Test
+    public void UserRegistrationHelperTest() throws IOException, TimeoutException {
+
+        String AAMOwnerUsername = "TestAAMOwnerUsername";
+        String AAMOwnerPassword = "TestAAMOwnerPassword";
+        String username = "testUsername";
+        String password = "testPassword";
+        String federatedId = "testFederatedId";
+        String recoveryMail = "null@dev.null";
+
+        String rabbitHost = "localhost";
+        String rabbitUsername = "guest";
+        String rabbitPassword = "guest";
+        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-user_manage_request";
+
+        ManagementStatus response = UserRegistrationHelper.registerUser(
+                AAMOwnerUsername,
+                AAMOwnerPassword,
+                username,
+                password,
+                federatedId,
+                recoveryMail,
+                rabbitHost,
+                rabbitUsername,
+                rabbitPassword,
+                userManagementRequestQueue);
+
+        assertEquals(ManagementStatus.OK, response);
+    }
+
+    @Test
+    public void PlatformRegistrationHelperTest() throws IOException, TimeoutException {
+
+        String AAMOwnerUsername = "testAAMOwnerUsername";
+        String AAMOwnerPassword = "testAAMOwnerPassword";
+        String platformId = "testPlatformId";
+        String platformOwnerUsername = "testPOUsername";
+        String platformOwnerPassword = "testPOPassword";
+        String platformInstanceFriendlyName = "testPlatformInstanceFriendlyName";
+        String platformInterworkingInterfaceAddress = "testPlatformInterworkingInterfaceAddress";
+
+        String rabbitHost = "localhost";
+        String rabbitUsername = "guest";
+        String rabbitPassword = "guest";
+        String platformManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-platform_manage_request";
+
+        PlatformManagementResponse response = PlatformRegistrationHelper.registerPlatform(
+                AAMOwnerUsername,
+                AAMOwnerPassword,
+                platformId,
+                platformOwnerUsername,
+                platformOwnerPassword,
+                platformInstanceFriendlyName,
+                platformInterworkingInterfaceAddress,
+                rabbitHost,
+                rabbitUsername,
+                rabbitPassword,
+                platformManagementRequestQueue);
+
+        assertEquals(ManagementStatus.OK, response.getRegistrationStatus());
+        assertEquals(platformId, response.getPlatformId());
+    }
+
+
 }

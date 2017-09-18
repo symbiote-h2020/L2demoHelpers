@@ -72,9 +72,7 @@ public class FederationRegistrationHelper {
 
         byte[] response = federationRuleManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                 (federationRuleManagementRequest).getBytes());
-
         log.info("Response from AAM acquired.");
-
         HashMap<String, FederationRule> responseMap = mapper.readValue(response, new TypeReference<HashMap<String, FederationRule>>() {
         });
         if (responseMap == null
@@ -85,7 +83,7 @@ public class FederationRegistrationHelper {
         return responseMap;
     }
 
-    private static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws IOException, TimeoutException {
+    public static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(rabbitHost);
         factory.setUsername(rabbitUsername);
