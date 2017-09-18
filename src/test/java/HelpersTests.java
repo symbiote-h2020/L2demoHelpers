@@ -53,9 +53,8 @@ public class HelpersTests {
 
     @Test
     public void UserRegistrationHelperTest() throws IOException, TimeoutException {
-
-        String AAMOwnerUsername = "TestAAMOwnerUsername";
-        String AAMOwnerPassword = "TestAAMOwnerPassword";
+        String AAMOwnerUsername = "AAMOwner";
+        String AAMOwnerPassword = "AAMOwner";
         String username = "testUsername";
         String password = "testPassword";
         String federatedId = "testFederatedId";
@@ -64,7 +63,7 @@ public class HelpersTests {
         String rabbitHost = "localhost";
         String rabbitUsername = "guest";
         String rabbitPassword = "guest";
-        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-user_manage_request";
+        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
 
         ManagementStatus response = UserRegistrationHelper.registerUser(
                 AAMOwnerUsername,
@@ -84,8 +83,8 @@ public class HelpersTests {
     @Test
     public void PlatformRegistrationHelperTest() throws IOException, TimeoutException {
 
-        String AAMOwnerUsername = "testAAMOwnerUsername";
-        String AAMOwnerPassword = "testAAMOwnerPassword";
+        String AAMOwnerUsername = "AAMOwner";
+        String AAMOwnerPassword = "AAMOwner";
         String platformId = "testPlatformId";
         String platformOwnerUsername = "testPOUsername";
         String platformOwnerPassword = "testPOPassword";
@@ -95,7 +94,7 @@ public class HelpersTests {
         String rabbitHost = "localhost";
         String rabbitUsername = "guest";
         String rabbitPassword = "guest";
-        String platformManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-platform_manage_request";
+        String platformManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_platform_request";
 
         PlatformManagementResponse response = PlatformRegistrationHelper.registerPlatform(
                 AAMOwnerUsername,

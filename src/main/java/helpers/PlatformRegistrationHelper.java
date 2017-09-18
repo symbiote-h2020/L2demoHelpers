@@ -90,8 +90,8 @@ public class PlatformRegistrationHelper {
     }
 
     public static void registerPlatformOwner() {
-        String AAMOwnerUsername = "testAAMOwnerUserName";
-        String AAMOwnerPassword = "testAAMOwnerPassword";
+        String AAMOwnerUsername = "AAMOwner";
+        String AAMOwnerPassword = "AAMOwner";
         String username = "testPOUsername";
         String password = "testPOpassword";
         String federatedId = "testPOFederatedId";
@@ -100,7 +100,7 @@ public class PlatformRegistrationHelper {
         String rabbitHost = "localhost";
         String rabbitUsername = "guest";
         String rabbitPassword = "guest";
-        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-user_manage_request";
+        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
 
         Connection connection = null;
         RpcClient userManagementOverAMQPClient = null;
@@ -116,7 +116,7 @@ public class PlatformRegistrationHelper {
                 Credentials(AAMOwnerUsername, AAMOwnerPassword), new Credentials(),
                 new UserDetails(new Credentials(username, password), federatedId, recoveryMail,
                         UserRole.PLATFORM_OWNER, new HashMap<>(), new HashMap<>()), OperationType.CREATE);
-        log.info(String.valueOf(userManagementRequest.getOperationType()));
+
         try {
             byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                     (userManagementRequest).getBytes());
