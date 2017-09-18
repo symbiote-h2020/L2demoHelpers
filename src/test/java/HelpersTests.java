@@ -112,7 +112,6 @@ public class HelpersTests {
 
         assertEquals(ManagementStatus.OK, response.getRegistrationStatus());
         assertEquals(platformId, response.getPlatformId());
-
     }
 
 
