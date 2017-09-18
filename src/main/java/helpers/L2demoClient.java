@@ -2,20 +2,28 @@ package helpers;
 
 import eu.h2020.symbiote.security.ComponentSecurityHandlerFactory;
 import eu.h2020.symbiote.security.accesspolicies.IAccessPolicy;
+import eu.h2020.symbiote.security.accesspolicies.common.SingleTokenAccessPolicyFactory;
+import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
 import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.commons.Token;
+import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsException;
 import eu.h2020.symbiote.security.commons.exceptions.custom.SecurityHandlerException;
 import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class L2demoClient {
 
-    public static void main(String[] args) throws SecurityHandlerException {
+    public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException {
+
+        Log log = LogFactory.getLog(L2demoClient.class);
+
         String serverAddress = "";
         String KEY_STORE_PATH = "";
         String KEY_STORE_PASSWORD = "";
@@ -27,26 +35,11 @@ public class L2demoClient {
         String rapPlatformOwnerUsername = "";
         String rapPlatformOwnerPassword = "";
 
-
+        SecurityRequest platformSecurityRequest = null;
 
         //TODO create and register platform owners and 2 platforms
+        //TODO Acquire home token from platform 1;
 
-        String crmKey = "crm";
-        String crmComponentId = crmKey + "@" + platformId;
-        // generating the CSH
-        IComponentSecurityHandler crmCSH = ComponentSecurityHandlerFactory.getComponentSecurityHandler(
-                serverAddress,
-                KEY_STORE_PATH,
-                KEY_STORE_PASSWORD,
-                crmComponentId,
-                serverAddress,
-                false,
-                platformOwnerUsername,
-                platformOwnerPassword
-        );
-        System.out.println(crmCSH.getSecurityHandler().getAvailableAAMs().values());
-        //TODO get proper AAM
-        //Token token = crmCSH.getSecurityHandler().login();
 
         String rapKey = "rap";
         String rapComponentId = rapKey + "@" + rapPlatformId;
@@ -56,24 +49,38 @@ public class L2demoClient {
                 serverAddress,
                 KEY_STORE_PATH,
                 KEY_STORE_PASSWORD,
-                crmComponentId,
+                rapComponentId,
                 serverAddress,
                 false,
                 rapPlatformOwnerUsername,
                 rapPlatformOwnerPassword
         );
-        //TODO add policy
+        //TODO add policy to platform 2
         Map<String, IAccessPolicy> testAP = new HashMap<>();
         String testPolicyId = "testPolicyId";
         Map<String, String> requiredClaims = new HashMap<>();
         requiredClaims.put(Claims.ISSUER, SecurityConstants.CORE_AAM_INSTANCE_ID);
-       // rapCSH.getSatisfiedPoliciesIdentifiers();
+        SingleTokenAccessPolicySpecifier testPolicySpecifier =
+                new SingleTokenAccessPolicySpecifier(
+                        SingleTokenAccessPolicySpecifier.SingleTokenAccessPolicyType.SLHTIBAP,
+                        requiredClaims);
+        testAP.put(testPolicyId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
-        //TODO check if policy is satisfied - shouldn't be using SecRequest from platform1
 
-        //TODO make federation rule for platform 1
-        //TODO get foreign token from core aam
-        //TODO check if policy is satisfied - it should be
+
+        //TODO Try to acquire access to resouce in platform 2 using platform1 home token - not possible
+        if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, platformSecurityRequest).isEmpty()){
+            log.error("Platform 1 SecurityRequest passed the rule. It should not.");
+        };
+
+
+        //TODO make federation rule in core for platform 1
+        //TODO get foreign token from core aam using homeToken from platform 1
+
+        SecurityRequest federatedSecurityRequest = null;
+        if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()){
+            log.error("Platform 1 federated SecurityRequest didn't pass the rule. It should.");
+        };
     }
 
 }
