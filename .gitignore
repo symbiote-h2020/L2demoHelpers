@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gradle/
+.idea/checkstyle-idea.xml
+.idea/gradle.xml
+.idea/inspectionProfiles/
+.idea/sonarlint/
+.idea/workspace.xml
+src/
