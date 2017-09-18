@@ -25,6 +25,8 @@ public class PlatformRegistrationHelper {
     protected static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {
+        registerPlatformOwner();
+
         String AAMOwnerUsername = "";
         String AAMOwnerPassword = "";
         String platformId = "";
@@ -60,7 +62,7 @@ public class PlatformRegistrationHelper {
         }
     }
 
-    public void registerPlatformOwner() {
+    public static void registerPlatformOwner() {
         String AAMOwnerUsername = "";
         String AAMOwnerPassword = "";
         String username = "";
