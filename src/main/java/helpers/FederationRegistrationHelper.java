@@ -29,8 +29,8 @@ public class FederationRegistrationHelper {
         Set<String> platformsIds = new HashSet<>();
         platformsIds.add("");
 
-        String AAMOwnerUsername = "";
-        String AAMOwnerPassword = "";
+        String coreAAMOwnerUsername = "";
+        String coreAAMOwnerPassword = "";
 
         String rabbitHost = "";
         String rabbitUsername = "";
@@ -42,8 +42,8 @@ public class FederationRegistrationHelper {
             registerFederation(
                     federationId,
                     platformsIds,
-                    AAMOwnerUsername,
-                    AAMOwnerPassword,
+                    coreAAMOwnerUsername,
+                    coreAAMOwnerPassword,
                     rabbitHost,
                     rabbitUsername,
                     rabbitPassword,
