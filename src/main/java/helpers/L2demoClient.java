@@ -1,5 +1,6 @@
 package helpers;
 
+import eu.h2020.symbiote.security.ClientSecurityHandlerFactory;
 import eu.h2020.symbiote.security.ComponentSecurityHandlerFactory;
 import eu.h2020.symbiote.security.accesspolicies.IAccessPolicy;
 import eu.h2020.symbiote.security.accesspolicies.common.SingleTokenAccessPolicyFactory;
@@ -11,6 +12,7 @@ import eu.h2020.symbiote.security.commons.exceptions.custom.SecurityHandlerExcep
 import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
+import eu.h2020.symbiote.security.handler.ISecurityHandler;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +42,15 @@ public class L2demoClient {
         //TODO create and register platform owners and 2 platforms
         //TODO Acquire home token from platform 1;
 
+        String clientId = "clientId";
+        // generating the CSH
+        ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
+                serverAddress,
+                KEY_STORE_PATH,
+                KEY_STORE_PASSWORD,
+                clientId
+        );
+        //clientSH.login();
 
         String rapKey = "rap";
         String rapComponentId = rapKey + "@" + rapPlatformId;
@@ -66,12 +77,10 @@ public class L2demoClient {
                         requiredClaims);
         testAP.put(testPolicyId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
-
-
-        //TODO Try to acquire access to resouce in platform 2 using platform1 home token - not possible
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, platformSecurityRequest).isEmpty()){
-            log.error("Platform 1 SecurityRequest passed the rule. It should not.");
+            log.error("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
         };
+        log.info("SecurityRequest using Platform1 home token not passed Access Policy");
 
 
         //TODO make federation rule in core for platform 1
@@ -79,8 +88,9 @@ public class L2demoClient {
 
         SecurityRequest federatedSecurityRequest = null;
         if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()){
-            log.error("Platform 1 federated SecurityRequest didn't pass the rule. It should.");
+            log.error("SecurityRequest using federated token didn't pass Access Policy. It should.");
         };
+        log.info("SecurityRequest using federated token passed Access Policy.");
     }
 
 }
