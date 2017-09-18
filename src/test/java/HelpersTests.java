@@ -1,4 +1,5 @@
 import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
+import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
 import eu.h2020.symbiote.security.communication.payloads.PlatformManagementResponse;
 import helpers.FederationRegistrationHelper;
@@ -54,9 +55,10 @@ public class HelpersTests {
     @Test
     public void UserRegistrationHelperTest() throws IOException, TimeoutException {
         String AAMOwnerUsername = "AAMOwner";
+        String AAMOwnerUsername = "AAMOwner";
         String AAMOwnerPassword = "AAMPassword";
-        String username = "testUsername";
-        String password = "testPassword";
+        String username = "testPOUsername";
+        String password = "testPOPassword";
         String federatedId = "testFederatedId";
         String recoveryMail = "null@dev.null";
 
