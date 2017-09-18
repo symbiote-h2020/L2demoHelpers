@@ -1,4 +1,5 @@
 import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
+import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
 import eu.h2020.symbiote.security.communication.payloads.PlatformManagementResponse;
 import helpers.FederationRegistrationHelper;
@@ -26,7 +27,7 @@ public class HelpersTests {
     @Test
     public void FederationRegistrationHelperTest() throws IOException, TimeoutException {
 
-        String federationId = "federationTest";
+        String federationId = "federationTest5";
         Set<String> platformsIds = new HashSet<>();
         platformsIds.add("testPlatform");
 
@@ -54,9 +55,10 @@ public class HelpersTests {
     @Test
     public void UserRegistrationHelperTest() throws IOException, TimeoutException {
         String AAMOwnerUsername = "AAMOwner";
-        String AAMOwnerPassword = "AAMOwner";
-        String username = "testUsername";
-        String password = "testPassword";
+        String AAMOwnerUsername = "AAMOwner";
+        String AAMOwnerPassword = "AAMPassword";
+        String username = "testPOUsername";
+        String password = "testPOPassword";
         String federatedId = "testFederatedId";
         String recoveryMail = "null@dev.null";
 
@@ -84,7 +86,7 @@ public class HelpersTests {
     public void PlatformRegistrationHelperTest() throws IOException, TimeoutException {
 
         String AAMOwnerUsername = "AAMOwner";
-        String AAMOwnerPassword = "AAMOwner";
+        String AAMOwnerPassword = "AAMPassword";
         String platformId = "testPlatformId";
         String platformOwnerUsername = "testPOUsername";
         String platformOwnerPassword = "testPOPassword";
