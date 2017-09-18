@@ -3,6 +3,7 @@ package helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.RpcClient;
+import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
 import eu.h2020.symbiote.security.commons.enums.OperationType;
 import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.Credentials;
@@ -24,6 +25,7 @@ public class UserRegistrationHelper {
     protected static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {
+        //TODO: fill all the proper fields
         String AAMOwnerUsername = "";
         String AAMOwnerPassword = "";
         String username = "";
@@ -36,6 +38,27 @@ public class UserRegistrationHelper {
         String rabbitPassword = "";
         String userManagementRequestQueue = "";
 
+        try {
+            registerUser(AAMOwnerUsername,
+                    AAMOwnerPassword,
+                    username,
+                    password,
+                    federatedId,
+                    recoveryMail,
+                    rabbitHost,
+                    rabbitUsername,
+                    rabbitPassword,
+                    userManagementRequestQueue);
+            log.info("Done");
+        } catch (IOException | TimeoutException e) {
+            log.error(e.getMessage());
+            log.error(e.getCause());
+        }
+    }
+
+    public static ManagementStatus registerUser(String AAMOwnerUsername, String AAMOwnerPassword, String username, String password,
+                                                String federatedId, String recoveryMail, String rabbitHost, String rabbitUsername,
+                                                String rabbitPassword, String userManagementRequestQueue) throws IOException, TimeoutException {
         Connection connection = null;
         RpcClient userManagementOverAMQPClient = null;
         try {
@@ -46,17 +69,14 @@ public class UserRegistrationHelper {
             log.error("Failed to open connection.");
         }
 
-
         UserManagementRequest userManagementRequest = new UserManagementRequest(new
                 Credentials(AAMOwnerUsername, AAMOwnerPassword), new Credentials(),
                 new UserDetails(new Credentials(username, password), federatedId, recoveryMail, UserRole.USER, new HashMap<>(), new HashMap<>()),
                 OperationType.CREATE);
 
-        try {
-            byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
-                    (userManagementRequest).getBytes());
-        } catch (IOException | TimeoutException e) {
-            log.error("Communication failed");
-        }
+        byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
+                (userManagementRequest).getBytes());
+        ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
+        return managementStatus;
     }
 }
