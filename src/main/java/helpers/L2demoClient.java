@@ -21,7 +21,6 @@ import eu.h2020.symbiote.security.helpers.PlatformAAMCertificateKeyStoreFactory;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -37,7 +36,6 @@ import java.util.concurrent.TimeoutException;
 import static helpers.Constants.*;
 import static helpers.PlatformRegistrationHelper.registerPlatform;
 import static helpers.PlatformRegistrationHelper.registerPlatformOwner;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 public class L2demoClient {
 
