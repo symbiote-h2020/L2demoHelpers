@@ -29,4 +29,12 @@ public class Constants {
     public static final String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
     public static final String platformManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_platform_request";
 
+    public static final String coreAAMServerAddress = "https://localhost:8801";
+    public static final String KEY_STORE_PATH = "./platform_1.p12";
+    public static final String PV_KEY_PASSWORD = "1234567";
+    public static final String KEY_STORE_PASSWORD = "1234567";
+    public static final String rootCACertificateAlias = "root_cert";
+    public static final String aamCertificateAlias = "platform_cert";
+
+
 }
