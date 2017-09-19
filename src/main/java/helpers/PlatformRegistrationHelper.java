@@ -27,8 +27,8 @@ public class PlatformRegistrationHelper {
 
         String AAMOwnerUsername = "";
         String AAMOwnerPassword = "";
-        String username = "";
-        String password = "";
+        String platformOwnerUsername = "";
+        String platformOwnerPassword = "";
         String federatedId = "";
         String recoveryMail = "";
 
@@ -40,8 +40,8 @@ public class PlatformRegistrationHelper {
         try {
             registerPlatformOwner(AAMOwnerUsername,
                     AAMOwnerPassword,
-                    username,
-                    password,
+                    platformOwnerUsername,
+                    platformOwnerPassword,
                     federatedId,
                     recoveryMail,
                     rabbitHost,
@@ -62,11 +62,11 @@ public class PlatformRegistrationHelper {
         try {
             registerPlatform(AAMOwnerUsername,
                     AAMOwnerPassword,
-                    platformId,
-                    username,
-                    password,
+                    platformOwnerUsername,
+                    platformOwnerPassword,
                     platformInstanceFriendlyName,
                     platformInterworkingInterfaceAddress,
+                    platformId,
                     rabbitHost,
                     rabbitUsername,
                     rabbitPassword,
@@ -82,7 +82,7 @@ public class PlatformRegistrationHelper {
     }
 
     public static PlatformManagementResponse registerPlatform(String AAMOwnerUsername, String AAMOwnerPassword, String platformOwnerUsername, String platformOwnerPassword,
-                                                              String platformId, String platformInstanceFriendlyName, String platformInterworkingInterfaceAddress,
+                                                              String platformInstanceFriendlyName, String platformInterworkingInterfaceAddress, String platformId,
                                                               String rabbitHost, String rabbitUsername, String rabbitPassword, String platformManagementRequestQueue) throws IOException, TimeoutException {
         Connection connection = null;
         RpcClient platformManagementOverAMQPClient = null;
@@ -110,7 +110,7 @@ public class PlatformRegistrationHelper {
         return platformRegistrationOverAMQPResponse;
     }
 
-    public static ManagementStatus registerPlatformOwner(String AAMOwnerUsername, String AAMOwnerPassword, String username, String password,
+    public static ManagementStatus registerPlatformOwner(String AAMOwnerUsername, String AAMOwnerPassword, String platformOwnerUsername, String platformOwnerPassword,
                                                          String federatedId, String recoveryMail, String rabbitHost, String rabbitUsername,
                                                          String rabbitPassword, String userManagementRequestQueue) throws IOException, TimeoutException {
 
@@ -126,7 +126,7 @@ public class PlatformRegistrationHelper {
 
         UserManagementRequest userManagementRequest = new UserManagementRequest(new
                 Credentials(AAMOwnerUsername, AAMOwnerPassword), new Credentials(),
-                new UserDetails(new Credentials(username, password), federatedId, recoveryMail,
+                new UserDetails(new Credentials(platformOwnerUsername, platformOwnerPassword), federatedId, recoveryMail,
                         UserRole.PLATFORM_OWNER, new HashMap<>(), new HashMap<>()), OperationType.CREATE);
 
         byte[] response = userManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString

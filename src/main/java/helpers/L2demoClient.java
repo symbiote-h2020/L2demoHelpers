@@ -22,17 +22,56 @@ import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
+
+import static helpers.Constants.*;
+import static helpers.PlatformRegistrationHelper.registerPlatform;
+import static helpers.PlatformRegistrationHelper.registerPlatformOwner;
 
 public class L2demoClient {
 
     public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException {
 
         Log log = LogFactory.getLog(L2demoClient.class);
+
+
+        try {
+            registerPlatformOwner(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername, platformOwnerPassword, federatedId, recoveryMail,
+                    rabbitHost, rabbitUsername, rabbitPassword, userManagementRequestQueue);
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            registerPlatformOwner(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername2, platformOwnerPassword2, federatedId2, recoveryMail2,
+                    rabbitHost, rabbitUsername, rabbitPassword, userManagementRequestQueue);
+        } catch (IOException | TimeoutException e) {
+            e.getMessage();
+            e.getCause();
+        }
+
+
+        try {
+            registerPlatform(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername, platformOwnerPassword, platformInstanceFriendlyName,
+                    platformInterworkingInterfaceAddress, platformId, rabbitHost, rabbitUsername, rabbitPassword, platformManagementRequestQueue);
+        } catch (IOException | TimeoutException e) {
+            e.getMessage();
+            e.getCause();
+        }
+
+        try {
+            registerPlatform(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername2, platformOwnerPassword2, platformInstanceFriendlyName2,
+                    platformInterworkingInterfaceAddress2, platformId2, rabbitHost, rabbitUsername, rabbitPassword, platformManagementRequestQueue);
+        } catch (IOException | TimeoutException e) {
+            e.getMessage();
+            e.getCause();
+        }
 
 
         String coreAAMServerAddress = "";
