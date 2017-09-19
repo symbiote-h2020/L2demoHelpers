@@ -105,7 +105,7 @@ public class L2demoClient {
         String password = "testPassword";
         String KEY_STORE_PATH = "./src/main/resources/new.p12";
         String PV_KEY_PASSWORD = "1234567";
-        PlatformAAMCertificateKeyStoreFactory.getPlatformAAMKeystore(
+        /*PlatformAAMCertificateKeyStoreFactory.getPlatformAAMKeystore(
                 coreAAMServerAddress, platformOwnerUsername, platformOwnerPassword, platformId, KEY_STORE_PATH,
                 KEY_STORE_PASSWORD,
                 "root_cert", "aam_cert", PV_KEY_PASSWORD
@@ -117,8 +117,12 @@ public class L2demoClient {
             trustStore.load(fIn, KEY_STORE_PASSWORD.toCharArray());
             fIn.close();
         }
+*/
 
-        Certificate cert = clientSH.getCertificate(platform1, username, password, userId );
+
+        Certificate cert = clientSH.getCertificate(platform1, platformOwnerUsername, platformOwnerPassword, "L2DemoApp" );
+
+
         //TODO get private key
         Token token = clientSH.login(platform1);
 
