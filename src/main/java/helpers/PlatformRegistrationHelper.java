@@ -103,8 +103,7 @@ public class PlatformRegistrationHelper {
         if (response == null) {
             throw new SecurityException("Platform not registered.");
         }
-        ErrorResponseContainer errorResponseContainer = mapper.readValue(response, ErrorResponseContainer.class);
-        log.info(errorResponseContainer.getErrorMessage());
+
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
 

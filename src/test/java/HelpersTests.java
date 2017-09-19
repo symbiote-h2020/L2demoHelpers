@@ -116,9 +116,9 @@ public class HelpersTests {
         PlatformManagementResponse response = PlatformRegistrationHelper.registerPlatform(
                 AAMOwnerUsername,
                 AAMOwnerPassword,
-                platformId,
                 platformOwnerUsername,
                 platformOwnerPassword,
+                platformId,
                 platformInstanceFriendlyName,
                 platformInterworkingInterfaceAddress,
                 rabbitHost,
