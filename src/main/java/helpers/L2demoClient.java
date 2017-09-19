@@ -15,22 +15,16 @@ import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
 import eu.h2020.symbiote.security.handler.ISecurityHandler;
-import eu.h2020.symbiote.security.helpers.ECDSAHelper;
 import eu.h2020.symbiote.security.helpers.MutualAuthenticationHelper;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.*;
 
-import static helpers.Constants.*;
 
 public class L2demoClient {
 
@@ -38,92 +32,41 @@ public class L2demoClient {
 
         Log log = LogFactory.getLog(L2demoClient.class);
 
-        String coreAAMServerAddress = "https://localhost:8080";
-        String DE = "core.p12";
-        String KEY_STORE_PASSWORD = "1234567";
-        String userPlatformId = "";
-        String rapPlatformId = "";
+        String platform1Username = "testUser";
+        String platform1Password = "testPassword";
 
-        String rapPlatformOwnerUsername = "";
-        String rapPlatformOwnerPassword = "";
-        String userId = "clientPlatformId";
-
-        //Acquire home token from platform 1;
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-        };
-        // Install the all-trusting trust manager
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        ECDSAHelper.enableECDSAProvider();
         // generating the CSH
         ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
-                coreAAMServerAddress,
-                DE,
-                KEY_STORE_PASSWORD,
-                userId
+                Constants.coreAAMServerAddress,
+                Constants.KEY_STORE_PATH,
+                Constants.KEY_STORE_PASSWORD,
+                Constants.userId
         );
         AAM coreAAM = clientSH.getCoreAAMInstance();
-        AAM platform1 = clientSH.getAvailableAAMs().get(platformId);
-        String username = "testUser";
-        String password = "testPassword";
-        String KEY_STORE_PATH = "./src/main/resources/new.p12";
-        String PV_KEY_PASSWORD = "1234567";
-        /*PlatformAAMCertificateKeyStoreFactory.getPlatformAAMKeystore(
-                coreAAMServerAddress, platformOwnerUsername, platformOwnerPassword, platformId, KEY_STORE_PATH,
-                KEY_STORE_PASSWORD,
-                "root_cert", "aam_cert", PV_KEY_PASSWORD
-        );
-        //keyStore checking if proper Certificates exists
-        KeyStore trustStore = KeyStore.getInstance("PKCS12", "BC");
-        try (
-            FileInputStream fIn = new FileInputStream(KEY_STORE_PATH)) {
-            trustStore.load(fIn, KEY_STORE_PASSWORD.toCharArray());
-            fIn.close();
-        }
-*/
+        AAM platform1 = clientSH.getAvailableAAMs().get(Constants.platformId);
 
-
-        Certificate cert = clientSH.getCertificate(platform1, platformOwnerUsername, platformOwnerPassword, "L2DemoApp" );
-
-
-        //TODO get private key
+        clientSH.getCertificate(platform1, platform1Username, platform1Password, Constants.userId );
         Token token = clientSH.login(platform1);
 
-        clientSH.getAcquiredCredentials();
         Set<AuthorizationCredentials> authorizationCredentialsSet=new HashSet<>();
-        //TODO put private key
-        //Certificate cert = null;
-        authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, new HomeCredentials(platform1, username, userId, cert, null)));
-
+        //TODO check this
+        authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
         SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
+        //rap platform
         String rapKey = "rap";
-        String rapComponentId = rapKey + "@" + rapPlatformId;
+        String rapComponentId = rapKey + "@" + Constants.platformId2;
         // generating the CSH
         //TODO configure rapCSH
         IComponentSecurityHandler rapCSH = ComponentSecurityHandlerFactory.getComponentSecurityHandler(
-                coreAAMServerAddress,
-                DE,
-                KEY_STORE_PASSWORD,
+                Constants.coreAAMServerAddress,
+                Constants.KEY_STORE_PATH,
+                Constants.KEY_STORE_PASSWORD,
                 rapComponentId,
-                coreAAMServerAddress,
+                Constants.rapAAMServerAddress,
                 false,
-                rapPlatformOwnerUsername,
-                rapPlatformOwnerPassword
+                Constants.platformOwnerUsername2,
+                Constants.platformOwnerPassword2
         );
         //adding policy to platform 2
         Map<String, IAccessPolicy> testAP = new HashMap<>();
@@ -143,19 +86,15 @@ public class L2demoClient {
         log.info("SecurityRequest using Platform1 home token not passed Access Policy");
         //TODO make pause after every operation (checking satisfied policies, generating foreignToken)
         log.info("SecurityRequest using Platform1 home token not passed Access Policy");
-        //TODO make federation rule in core for platform 1
 
-        //TODO get foreign token from core aam using homeToken from platform 1
+        //get foreign token from core aam using homeToken from platform 1
         List <AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
         Map<AAM, Token> foreignTokens = clientSH.login(aamList, token.toString());
         authorizationCredentialsSet=new HashSet<>();
-        //TODO put private key
-        authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, new HomeCredentials(platform1, username, userId, cert, null)));
-        securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
+        authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, clientSH.getAcquiredCredentials().get(coreAAM.getAamInstanceId()).homeCredentials));
+        SecurityRequest federatedSecurityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
-
-        SecurityRequest federatedSecurityRequest = null;
         if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()){
             log.error("SecurityRequest using federated token didn't pass Access Policy. It should.");
         }
