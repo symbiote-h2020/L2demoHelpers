@@ -24,10 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 import static helpers.Constants.*;
@@ -73,7 +70,6 @@ public class L2demoClient {
             e.getCause();
         }
 
-
         String coreAAMServerAddress = "";
         String KEY_STORE_PATH = "";
         String KEY_STORE_PASSWORD = "";
@@ -84,13 +80,13 @@ public class L2demoClient {
 
         String rapPlatformOwnerUsername = "";
         String rapPlatformOwnerPassword = "";
-
+        String userId = "clientPlatformId";
 
 
         //TODO create and register platform owners and 2 platforms
 
         //Acquire home token from platform 1;
-        String userId = "clientPlatformId";
+
         // generating the CSH
         ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
                 coreAAMServerAddress,
@@ -102,12 +98,16 @@ public class L2demoClient {
         AAM platform1 = clientSH.getAvailableAAMs().get(userPlatformId);
         String username = "testUser";
         String password = "testPassword";
+
         Certificate cert = clientSH.getCertificate(platform1, username, password, userId );
         //TODO get private key
         Token token = clientSH.login(platform1);
+
+        clientSH.getAcquiredCredentials();
         Set<AuthorizationCredentials> authorizationCredentialsSet=new HashSet<>();
         //TODO put private key
         authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, new HomeCredentials(platform1, username, userId, cert, null)));
+
         SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
         String rapKey = "rap";
@@ -143,7 +143,16 @@ public class L2demoClient {
         //TODO make pause after every operation (checking satisfied policies, generating foreignToken)
         log.info("SecurityRequest using Platform1 home token not passed Access Policy");
         //TODO make federation rule in core for platform 1
+
         //TODO get foreign token from core aam using homeToken from platform 1
+        List <AAM> aamList = new ArrayList<>();
+        aamList.add(coreAAM);
+        Map<AAM, Token> foreignTokens = clientSH.login(aamList, token.toString());
+        authorizationCredentialsSet=new HashSet<>();
+        //TODO put private key
+        authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, new HomeCredentials(platform1, username, userId, cert, null)));
+        securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
+
 
         SecurityRequest federatedSecurityRequest = null;
         if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()){
