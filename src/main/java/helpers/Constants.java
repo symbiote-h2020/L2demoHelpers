@@ -14,15 +14,15 @@ public class Constants {
     public static final String federatedId2 = "federatedId2";
     public static final String recoveryMail2 = "null2@dev.null";
 
-    public static final String platformId = "testPlatformId";
+    public static final String platformId = "platform_1";
     public static final String platformInstanceFriendlyName = "testPlatformInstanceFriendlyName";
-    public static final String platformInterworkingInterfaceAddress = "testPlatformInterworkingInterfaceAddress";
+    public static final String platformInterworkingInterfaceAddress = "https//localhost:8100";
 
     public static final String platformId2 = "testPlatformId2";
     public static final String platformInstanceFriendlyName2 = "testPlatformInstanceFriendlyName2";
     public static final String platformInterworkingInterfaceAddress2 = "testPlatformInterworkingInterfaceAddress2";
 
-    public static final String rabbitHost = "lccalhost";
+    public static final String rabbitHost = "localhost";
     public static final String rabbitUsername = "guest";
     public static final String rabbitPassword = "guest";
 

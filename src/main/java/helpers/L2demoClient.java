@@ -10,30 +10,38 @@ import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.commons.Token;
 import eu.h2020.symbiote.security.commons.credentials.AuthorizationCredentials;
 import eu.h2020.symbiote.security.commons.credentials.HomeCredentials;
-import eu.h2020.symbiote.security.commons.exceptions.custom.InvalidArgumentsException;
-import eu.h2020.symbiote.security.commons.exceptions.custom.SecurityHandlerException;
-import eu.h2020.symbiote.security.commons.exceptions.custom.ValidationException;
+import eu.h2020.symbiote.security.commons.exceptions.custom.*;
 import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
 import eu.h2020.symbiote.security.handler.ISecurityHandler;
+import eu.h2020.symbiote.security.helpers.ECDSAHelper;
 import eu.h2020.symbiote.security.helpers.MutualAuthenticationHelper;
+import eu.h2020.symbiote.security.helpers.PlatformAAMCertificateKeyStoreFactory;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 import static helpers.Constants.*;
 import static helpers.PlatformRegistrationHelper.registerPlatform;
 import static helpers.PlatformRegistrationHelper.registerPlatformOwner;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 public class L2demoClient {
 
-    public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException, CertificateException, WrongCredentialsException, NotExistingUserException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException {
 
         Log log = LogFactory.getLog(L2demoClient.class);
 
@@ -55,34 +63,62 @@ public class L2demoClient {
         }
 
 
-        String coreAAMServerAddress = "";
-        String KEY_STORE_PATH = "";
-        String KEY_STORE_PASSWORD = "";
+        String coreAAMServerAddress = "https://localhost:8080";
+        String DE = "core.p12";
+        String KEY_STORE_PASSWORD = "1234567";
         String userPlatformId = "";
         String rapPlatformId = "";
-        String platformOwnerUsername = "";
-        String platformOwnerPassword = "";
 
         String rapPlatformOwnerUsername = "";
         String rapPlatformOwnerPassword = "";
         String userId = "clientPlatformId";
 
-
-        //TODO create and register platform owners and 2 platforms
-
         //Acquire home token from platform 1;
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
 
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        // Install the all-trusting trust manager
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        ECDSAHelper.enableECDSAProvider();
         // generating the CSH
         ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
                 coreAAMServerAddress,
-                KEY_STORE_PATH,
+                DE,
                 KEY_STORE_PASSWORD,
                 userId
         );
         AAM coreAAM = clientSH.getCoreAAMInstance();
-        AAM platform1 = clientSH.getAvailableAAMs().get(userPlatformId);
+        AAM platform1 = clientSH.getAvailableAAMs().get(platformId);
         String username = "testUser";
         String password = "testPassword";
+        String KEY_STORE_PATH = "./src/main/resources/new.p12";
+        String PV_KEY_PASSWORD = "1234567";
+        PlatformAAMCertificateKeyStoreFactory.getPlatformAAMKeystore(
+                coreAAMServerAddress, platformOwnerUsername, platformOwnerPassword, platformId, KEY_STORE_PATH,
+                KEY_STORE_PASSWORD,
+                "root_cert", "aam_cert", PV_KEY_PASSWORD
+        );
+        //keyStore checking if proper Certificates exists
+        KeyStore trustStore = KeyStore.getInstance("PKCS12", "BC");
+        try (
+            FileInputStream fIn = new FileInputStream(KEY_STORE_PATH)) {
+            trustStore.load(fIn, KEY_STORE_PASSWORD.toCharArray());
+            fIn.close();
+        }
 
         Certificate cert = clientSH.getCertificate(platform1, username, password, userId );
         //TODO get private key
@@ -91,6 +127,7 @@ public class L2demoClient {
         clientSH.getAcquiredCredentials();
         Set<AuthorizationCredentials> authorizationCredentialsSet=new HashSet<>();
         //TODO put private key
+        //Certificate cert = null;
         authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, new HomeCredentials(platform1, username, userId, cert, null)));
 
         SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
@@ -101,7 +138,7 @@ public class L2demoClient {
         //TODO configure rapCSH
         IComponentSecurityHandler rapCSH = ComponentSecurityHandlerFactory.getComponentSecurityHandler(
                 coreAAMServerAddress,
-                KEY_STORE_PATH,
+                DE,
                 KEY_STORE_PASSWORD,
                 rapComponentId,
                 coreAAMServerAddress,
