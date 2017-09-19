@@ -13,7 +13,7 @@ import static helpers.Constants.*;
 import static helpers.PlatformRegistrationHelper.registerPlatform;
 import static helpers.PlatformRegistrationHelper.registerPlatformOwner;
 
-public class L2demoRegistry {
+public class P1_PlatformRegistry {
     public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException, CertificateException, WrongCredentialsException, NotExistingUserException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException {
 
         Log log = LogFactory.getLog(L2demoClient.class);
