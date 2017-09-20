@@ -17,7 +17,7 @@ import java.security.*;
 import java.security.cert.CertificateException;
 
 
-public class P2_GeneratePlatformKeyStore {
+public class P2_Platform1AAMKeyStoreGeneration {
 
     public static void main(String[] args) throws IOException, CertificateException, NoSuchAlgorithmException, ValidationException, InvalidArgumentsException, InvalidAlgorithmParameterException, NotExistingUserException, NoSuchProviderException, WrongCredentialsException, KeyStoreException, KeyManagementException {
         TrustManager[] trustAllCerts = new TrustManager[]{
