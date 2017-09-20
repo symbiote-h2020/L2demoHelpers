@@ -7,7 +7,6 @@ import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
 import eu.h2020.symbiote.security.commons.enums.OperationType;
 import eu.h2020.symbiote.security.commons.enums.UserRole;
 import eu.h2020.symbiote.security.communication.payloads.*;
-import eu.h2020.symbiote.security.helpers.PlatformAAMCertificateKeyStoreFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,7 +18,7 @@ import static helpers.FederationRegistrationHelper.getConnection;
 
 public class PlatformRegistrationHelper {
 
-    private static Log log = LogFactory.getLog(PlatformAAMCertificateKeyStoreFactory.class);
+    private static Log log = LogFactory.getLog(PlatformRegistrationHelper.class);
     protected static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {

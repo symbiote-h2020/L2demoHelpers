@@ -22,6 +22,11 @@ public class Constants {
     public static final String platformInstanceFriendlyName2 = "testPlatformInstanceFriendlyName2";
     public static final String platformInterworkingInterfaceAddress2 = "testPlatformInterworkingInterfaceAddress2";
 
+    public static final String username = "testUsername";
+    public static final String password = "testPassword";
+    public static final String federatedId3 = "testFederatedId3";
+    public static final String recoveryMail3 = "null3@dev.null";
+
     public static final String rabbitHost = "localhost";
     public static final String rabbitUsername = "guest";
     public static final String rabbitPassword = "guest";
@@ -39,6 +44,7 @@ public class Constants {
 
     public static final String userId = "L2DemoApp";
 
+    public static String AAMServerAddress = "https://localhost:8801";
 
     public static String rapAAMServerAddress = "https://localhost:8802";
 }

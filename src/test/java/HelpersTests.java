@@ -4,8 +4,11 @@ import eu.h2020.symbiote.security.communication.payloads.PlatformManagementRespo
 import helpers.FederationRegistrationHelper;
 import helpers.PlatformRegistrationHelper;
 import helpers.UserRegistrationHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -18,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 
 
 public class HelpersTests {
+
+    Log log = LogFactory.getLog(HelpersTests.class);
 
     @Before
     public void setUp() {
@@ -55,29 +60,19 @@ public class HelpersTests {
     public void UserRegistrationHelperTest() throws IOException, TimeoutException {
         String AAMOwnerUsername = "AAMOwner";
         String AAMOwnerPassword = "AAMPassword";
-        String username = "testPOUsername";
-        String password = "testPOPassword";
+        String username = "testUsername";
+        String password = "testPassword";
         String federatedId = "testFederatedId";
         String recoveryMail = "null@dev.null";
 
-        String rabbitHost = "localhost";
-        String rabbitUsername = "guest";
-        String rabbitPassword = "guest";
-        String userManagementRequestQueue = "symbIoTe-AuthenticationAuthorizationManager-manage_user_request";
-
-        ManagementStatus response = UserRegistrationHelper.registerUser(
+        ResponseEntity<ManagementStatus> response = UserRegistrationHelper.registerUser(
                 AAMOwnerUsername,
                 AAMOwnerPassword,
                 username,
                 password,
                 federatedId,
-                recoveryMail,
-                rabbitHost,
-                rabbitUsername,
-                rabbitPassword,
-                userManagementRequestQueue);
-
-        assertEquals(ManagementStatus.OK, response);
+                recoveryMail);
+        assertEquals(ManagementStatus.OK, response.getBody());
     }
 
     @Test
@@ -112,6 +107,8 @@ public class HelpersTests {
                 rabbitPassword,
                 userManagementRequestQueue
         );
+
+        assertEquals(ManagementStatus.OK, userResponse);
 
         PlatformManagementResponse response = PlatformRegistrationHelper.registerPlatform(
                 AAMOwnerUsername,

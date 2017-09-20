@@ -1,4 +1,4 @@
-package helpers;
+package demo_steps;
 
 import eu.h2020.symbiote.security.commons.exceptions.custom.*;
 import org.apache.commons.logging.Log;
@@ -16,7 +16,7 @@ import static helpers.PlatformRegistrationHelper.registerPlatformOwner;
 public class P1_PlatformRegistry {
     public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException, CertificateException, WrongCredentialsException, NotExistingUserException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException {
 
-        Log log = LogFactory.getLog(L2demoClient.class);
+        Log log = LogFactory.getLog(P1_PlatformRegistry.class);
 
         try {
             registerPlatformOwner(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername, platformOwnerPassword, federatedId, recoveryMail,
