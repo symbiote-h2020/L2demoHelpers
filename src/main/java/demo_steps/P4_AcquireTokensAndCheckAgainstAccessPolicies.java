@@ -1,21 +1,20 @@
-package helpers;
+package demo_steps;
 
 import eu.h2020.symbiote.security.ClientSecurityHandlerFactory;
 import eu.h2020.symbiote.security.ComponentSecurityHandlerFactory;
 import eu.h2020.symbiote.security.accesspolicies.IAccessPolicy;
 import eu.h2020.symbiote.security.accesspolicies.common.SingleTokenAccessPolicyFactory;
 import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
-import eu.h2020.symbiote.security.commons.Certificate;
 import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.commons.Token;
 import eu.h2020.symbiote.security.commons.credentials.AuthorizationCredentials;
-import eu.h2020.symbiote.security.commons.credentials.HomeCredentials;
 import eu.h2020.symbiote.security.commons.exceptions.custom.*;
 import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
 import eu.h2020.symbiote.security.handler.ISecurityHandler;
 import eu.h2020.symbiote.security.helpers.MutualAuthenticationHelper;
+import helpers.Constants;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,11 +25,12 @@ import java.security.cert.CertificateException;
 import java.util.*;
 
 
-public class L2demoClient {
+public class P4_AcquireTokensAndCheckAgainstAccessPolicies {
+
+    private static final Log log = LogFactory.getLog(P4_AcquireTokensAndCheckAgainstAccessPolicies.class);
 
     public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException, CertificateException, WrongCredentialsException, NotExistingUserException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException {
 
-        Log log = LogFactory.getLog(L2demoClient.class);
 
         String platform1Username = "testUser";
         String platform1Password = "testPassword";
@@ -82,23 +82,24 @@ public class L2demoClient {
         //TODO change those ifs, they are stupid
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()){
             log.error("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
+            throw new SecurityException("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
         }
         log.info("SecurityRequest using Platform1 home token not passed Access Policy");
         //TODO make pause after every operation (checking satisfied policies, generating foreignToken)
-        log.info("SecurityRequest using Platform1 home token not passed Access Policy");
 
         //get foreign token from core aam using homeToken from platform 1
         List <AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
         Map<AAM, Token> foreignTokens = clientSH.login(aamList, token.toString());
+        log.info("Foreign token acquired");
         authorizationCredentialsSet=new HashSet<>();
         authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, clientSH.getAcquiredCredentials().get(coreAAM.getAamInstanceId()).homeCredentials));
         SecurityRequest federatedSecurityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
         if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()){
             log.error("SecurityRequest using federated token didn't pass Access Policy. It should.");
+            throw new SecurityException("SecurityRequest using federated token didn't pass Access Policy. It should.");
         }
         log.info("SecurityRequest using federated token passed Access Policy.");
     }
-
 }
