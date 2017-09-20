@@ -89,7 +89,7 @@ public class P5_L2demoClient {
                 Constants.KEY_STORE_PATH,
                 Constants.KEY_STORE_PASSWORD,
                 rapComponentId,
-                Constants.rapAAMServerAddress,
+                Constants.coreAAMServerAddress,
                 false,
                 Constants.platformOwnerUsername2,
                 Constants.platformOwnerPassword2
