@@ -6,5 +6,6 @@ They are named P[x]-[description], where x is a step number, in which order they
 * P2_GeneratePlatformKeyStore - generates platform keyStore. Working CoreAAM is required! See:[CoreAAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-CORE ).
 KeyStore should be placed in platformAAM in main.resources. See:[Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1 ).
 * P3_UserRegistry - registers user in platform.
-* P4_AcquireTokensAndCheckAgainstAccessPolicies - acquires local home token from platform1AAM and verify it against federation access policies. 
+* P4_RegisterFederation - registers federation in CoreAAM database.
+* P5_AcquireTokensAndCheckAgainstAccessPolicies - acquires local home token from platform1AAM and verify it against federation access policies. 
 Acquire federated token from CoreAAM and than again check it against policies. Working CoreAAM and platform1AAM are required

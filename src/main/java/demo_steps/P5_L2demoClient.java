@@ -5,7 +5,6 @@ import eu.h2020.symbiote.security.ComponentSecurityHandlerFactory;
 import eu.h2020.symbiote.security.accesspolicies.IAccessPolicy;
 import eu.h2020.symbiote.security.accesspolicies.common.SingleTokenAccessPolicyFactory;
 import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
-import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.commons.Token;
 import eu.h2020.symbiote.security.commons.credentials.AuthorizationCredentials;
 import eu.h2020.symbiote.security.commons.exceptions.custom.*;
@@ -13,27 +12,49 @@ import eu.h2020.symbiote.security.communication.payloads.AAM;
 import eu.h2020.symbiote.security.communication.payloads.SecurityRequest;
 import eu.h2020.symbiote.security.handler.IComponentSecurityHandler;
 import eu.h2020.symbiote.security.handler.ISecurityHandler;
+import eu.h2020.symbiote.security.helpers.ECDSAHelper;
 import eu.h2020.symbiote.security.helpers.MutualAuthenticationHelper;
 import helpers.Constants;
-import io.jsonwebtoken.Claims;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.*;
 
 
-public class P4_AcquireTokensAndCheckAgainstAccessPolicies {
+public class P5_L2demoClient {
 
-    private static final Log log = LogFactory.getLog(P4_AcquireTokensAndCheckAgainstAccessPolicies.class);
+    private static final Log log = LogFactory.getLog(P5_L2demoClient.class);
 
-    public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException, CertificateException, WrongCredentialsException, NotExistingUserException, KeyStoreException, NoSuchProviderException, InvalidAlgorithmParameterException, IOException {
+    public static void main(String[] args) throws SecurityHandlerException, InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException {
 
 
-        String platform1Username = "testUser";
-        String platform1Password = "testPassword";
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+        // Install the all-trusting trust manager
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        ECDSAHelper.enableECDSAProvider();
 
         // generating the CSH
         ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
@@ -45,12 +66,13 @@ public class P4_AcquireTokensAndCheckAgainstAccessPolicies {
         AAM coreAAM = clientSH.getCoreAAMInstance();
         AAM platform1 = clientSH.getAvailableAAMs().get(Constants.platformId);
 
-        clientSH.getCertificate(platform1, platform1Username, platform1Password, Constants.userId );
+        //TODO change coreAAM to platform1
+        clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId );
         Token token = clientSH.login(platform1);
 
         Set<AuthorizationCredentials> authorizationCredentialsSet=new HashSet<>();
         //TODO check this
-        authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
+        authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, clientSH.getAcquiredCredentials().get(coreAAM.getAamInstanceId()).homeCredentials));
         SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
         //rap platform
@@ -70,14 +92,14 @@ public class P4_AcquireTokensAndCheckAgainstAccessPolicies {
         );
         //adding policy to platform 2
         Map<String, IAccessPolicy> testAP = new HashMap<>();
-        String testPolicyId = "testPolicyId";
-        Map<String, String> requiredClaims = new HashMap<>();
-        requiredClaims.put(Claims.ISSUER, SecurityConstants.CORE_AAM_INSTANCE_ID);
-        SingleTokenAccessPolicySpecifier testPolicySpecifier =
-                new SingleTokenAccessPolicySpecifier(
-                        SingleTokenAccessPolicySpecifier.SingleTokenAccessPolicyType.SLHTIBAP,
-                        requiredClaims);
-        testAP.put(testPolicyId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
+        String federationId = "federationId";
+        Set<String> federationMembers = new HashSet<>();
+        federationMembers.add(platform1.getAamInstanceId());
+        federationMembers.add(rapComponentId);
+        String goodResourceId = "resourceId";
+
+        SingleTokenAccessPolicySpecifier testPolicySpecifier = new SingleTokenAccessPolicySpecifier(federationMembers, rapComponentId, federationId);
+        testAP.put(goodResourceId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
         //TODO change those ifs, they are stupid
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()){
@@ -90,6 +112,7 @@ public class P4_AcquireTokensAndCheckAgainstAccessPolicies {
         //get foreign token from core aam using homeToken from platform 1
         List <AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
+
         Map<AAM, Token> foreignTokens = clientSH.login(aamList, token.toString());
         log.info("Foreign token acquired");
         authorizationCredentialsSet=new HashSet<>();

@@ -17,8 +17,8 @@ import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
+import static demo_steps.P4_RegisterFederation.*;
 import static helpers.Constants.*;
-import static helpers.FederationRegistrationHelper.getConnection;
 
 public class P1_PlatformsRegistrationInCoreAAM {
 
@@ -26,17 +26,6 @@ public class P1_PlatformsRegistrationInCoreAAM {
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) throws
-            SecurityHandlerException,
-            InvalidArgumentsException,
-            ValidationException,
-            NoSuchAlgorithmException,
-            KeyManagementException,
-            CertificateException,
-            WrongCredentialsException,
-            NotExistingUserException,
-            KeyStoreException,
-            NoSuchProviderException,
-            InvalidAlgorithmParameterException,
             IOException {
 
 
