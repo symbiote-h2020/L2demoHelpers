@@ -6,18 +6,15 @@ import com.rabbitmq.client.RpcClient;
 import eu.h2020.symbiote.security.commons.enums.ManagementStatus;
 import eu.h2020.symbiote.security.commons.enums.OperationType;
 import eu.h2020.symbiote.security.commons.enums.UserRole;
-import eu.h2020.symbiote.security.commons.exceptions.custom.*;
 import eu.h2020.symbiote.security.communication.payloads.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.security.*;
-import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
-import static demo_steps.P4_RegisterFederation.*;
+import static demo_steps.P4_FederationRegistration.getConnection;
 import static helpers.Constants.*;
 
 public class P1_PlatformsRegistrationInCoreAAM {
