@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-public class P4_RegisterFederation {
+public class P4_FederationRegistration {
 
-    private static Log log = LogFactory.getLog(P4_RegisterFederation.class);
+    private static Log log = LogFactory.getLog(P4_FederationRegistration.class);
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {
