@@ -25,6 +25,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -36,7 +37,11 @@ public class P5_L2demoClient {
 
     public static void main(String[] args) throws
             SecurityHandlerException,
-            InvalidArgumentsException, ValidationException, NoSuchAlgorithmException, KeyManagementException {
+            InvalidArgumentsException,
+            ValidationException,
+            NoSuchAlgorithmException,
+            KeyManagementException,
+            IOException {
 
 
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -118,8 +123,15 @@ public class P5_L2demoClient {
         List<AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
 
-        Map<AAM, Token> foreignTokens = clientSH.login(aamList, token.toString());
-        log.info("Foreign token acquired");
+        Map<AAM, Token> foreignTokens = new HashMap<>();
+        try {
+            foreignTokens = clientSH.login(aamList, token.toString());
+            log.info("Foreign token acquired");
+        } catch (SecurityHandlerException | NullPointerException e) {
+            log.error("Failed to acquire foreign token");
+            System.exit(1);
+        }
+
         authorizationCredentialsSet = new HashSet<>();
         authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
         SecurityRequest federatedSecurityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
@@ -129,5 +141,15 @@ public class P5_L2demoClient {
             throw new SecurityException("SecurityRequest using federated token didn't pass Access Policy. It should.");
         }
         log.info("SecurityRequest using federated token passed Access Policy.");
+
+        log.info("Waiting for federation update");
+        System.in.read();
+
+        log.info("Trying to access the resource again using the cached foreign token");
+
+        if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
+            log.info("SecurityRequest using federated token didn't pass Access Policy as the token was revoked");
+        } else
+            log.error("SecurityRequest using federated token passed Access Policy. It should NOT.");
     }
 }

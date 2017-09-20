@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.RpcClient;
+import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.communication.payloads.Credentials;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
 import eu.h2020.symbiote.security.communication.payloads.FederationRuleManagementRequest;
@@ -19,18 +20,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-public class P4_FederationRegistration {
+public class P6_FederationUpdate {
 
-    private static Log log = LogFactory.getLog(P4_FederationRegistration.class);
+    private static Log log = LogFactory.getLog(P6_FederationUpdate.class);
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) {
         Set<String> platformsIds = new HashSet<>();
-        platformsIds.add(Constants.platformId);
+        platformsIds.add(SecurityConstants.CORE_AAM_INSTANCE_ID);
         platformsIds.add(Constants.platformId2);
 
         try {
-            registerFederation(
+            updateFederation(
                     Constants.federationId,
                     platformsIds,
                     Constants.AAMOwnerUsername,
@@ -48,7 +49,9 @@ public class P4_FederationRegistration {
 
     }
 
-    private static Map<String, FederationRule> registerFederation(String federationId, Set<String> platformsIds, String aamOwnerUsername, String aamOwnerPassword, String rabbitHost, String rabbitUsername, String rabbitPassword, String federationRuleManagementRequestQueue) throws IOException, TimeoutException {
+    private static Map<String, FederationRule> updateFederation(String federationId, Set<String> platformsIds, String aamOwnerUsername, String aamOwnerPassword, String rabbitHost, String rabbitUsername, String rabbitPassword, String federationRuleManagementRequestQueue) throws
+            IOException,
+            TimeoutException {
         Connection connection = getConnection(rabbitHost, rabbitUsername, rabbitPassword);
         RpcClient federationRuleManagementOverAMQPClient = new RpcClient(connection.createChannel(), "",
                 federationRuleManagementRequestQueue, 5000);
@@ -58,7 +61,7 @@ public class P4_FederationRegistration {
                 new Credentials(aamOwnerUsername, aamOwnerPassword),
                 federationId,
                 platformsIds,
-                FederationRuleManagementRequest.OperationType.CREATE);
+                FederationRuleManagementRequest.OperationType.UPDATE);
         log.info("FederationRuleManagementRequest constructed.");
 
         byte[] response = federationRuleManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
@@ -70,12 +73,14 @@ public class P4_FederationRegistration {
                 || responseMap.get(federationId) == null) {
             throw new SecurityException("Federation was not registered. Please, try again.");
         }
-        log.info("Federation registered.");
+        log.info("Federation UPDATED.");
         connection.close();
         return responseMap;
     }
 
-    static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws IOException, TimeoutException {
+    static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws
+            IOException,
+            TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(rabbitHost);
         factory.setUsername(rabbitUsername);
