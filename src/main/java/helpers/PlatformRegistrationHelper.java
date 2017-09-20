@@ -105,7 +105,7 @@ public class PlatformRegistrationHelper {
 
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
-
+        log.info("platform registration done");
         return platformRegistrationOverAMQPResponse;
     }
 
@@ -132,6 +132,7 @@ public class PlatformRegistrationHelper {
                     (userManagementRequest).getBytes());
 
         ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
+        log.info("Platform owner registration done");
         return managementStatus;
     }
 

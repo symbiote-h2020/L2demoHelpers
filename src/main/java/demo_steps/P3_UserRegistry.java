@@ -19,12 +19,15 @@ public class P3_UserRegistry {
                     username,
                     password,
                     federatedId3,
-                    recoveryMail3);
+                    recoveryMail3,
+                    platform1AAMServerAddress
+            );
+            log.info("User registration done");
         } catch (IOException | TimeoutException e) {
             log.error(e.getMessage());
             log.error(e.getCause());
         }
 
-        log.info("User registration done");
+
     }
 }

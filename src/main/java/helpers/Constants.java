@@ -44,7 +44,5 @@ public class Constants {
 
     public static final String userId = "L2DemoApp";
 
-    public static String AAMServerAddress = "https://localhost:8801";
-
     public static String rapAAMServerAddress = "https://localhost:8802";
 }

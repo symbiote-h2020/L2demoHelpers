@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.*;
+import static helpers.Constants.platform1AAMServerAddress;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class HelpersTests {
@@ -70,8 +72,9 @@ public class HelpersTests {
                 username,
                 password,
                 federatedId,
-                recoveryMail);
-        assertNotNull(response.getBody());
+                recoveryMail,
+                platform1AAMServerAddress);
+        assertEquals(ManagementStatus.OK, response.getBody());
     }
 
     @Test

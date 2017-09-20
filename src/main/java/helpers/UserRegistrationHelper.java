@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
-import static helpers.Constants.AAMServerAddress;
+import static helpers.Constants.platform1AAMServerAddress;
 
 public class UserRegistrationHelper {
 
@@ -29,12 +29,12 @@ public class UserRegistrationHelper {
 
     public static void main(String[] args) {
         //TODO: fill all the proper fields
-        String AAMOwnerUsername = "";
-        String AAMOwnerPassword = "";
-        String username = "";
-        String password = "";
-        String federatedId = "";
-        String recoveryMail = "";
+        String AAMOwnerUsername = Constants.AAMOwnerUsername;
+        String AAMOwnerPassword = Constants.AAMOwnerPassword;
+        String username = Constants.username;
+        String password = Constants.password;
+        String federatedId = Constants.federatedId3;
+        String recoveryMail = Constants.recoveryMail3;
 
         try {
             registerUser(AAMOwnerUsername,
@@ -42,7 +42,8 @@ public class UserRegistrationHelper {
                     username,
                     password,
                     federatedId,
-                    recoveryMail);
+                    recoveryMail,
+                    platform1AAMServerAddress);
             log.info("Done");
         } catch (IOException | TimeoutException e) {
             log.error(e.getMessage());
@@ -52,8 +53,8 @@ public class UserRegistrationHelper {
 
 
     public static ResponseEntity<ManagementStatus> registerUser(String AAMOwnerUsername, String AAMOwnerPassword, String username, String password,
-                                                                String federatedId, String recoveryMail) throws IOException, TimeoutException {
-        IAAMClient aamClient = new AAMClient(AAMServerAddress);
+                                                                String federatedId, String recoveryMail, String serverAddress) throws IOException, TimeoutException {
+        IAAMClient aamClient = new AAMClient(serverAddress);
 
         UserManagementRequest userManagementRequest = new UserManagementRequest(new
                 Credentials(AAMOwnerUsername, AAMOwnerPassword), new Credentials(),
@@ -62,6 +63,7 @@ public class UserRegistrationHelper {
 
         try {
             ManagementStatus managementStatus = aamClient.manageUser(userManagementRequest);
+            log.info("User registration done");
             return ResponseEntity.status(HttpStatus.OK).body(managementStatus);
         } catch (AAMException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ManagementStatus.ERROR);
