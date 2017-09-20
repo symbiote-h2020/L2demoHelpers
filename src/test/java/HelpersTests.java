@@ -16,8 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class HelpersTests {
@@ -72,7 +71,7 @@ public class HelpersTests {
                 password,
                 federatedId,
                 recoveryMail);
-        assertEquals(ManagementStatus.OK, response.getBody());
+        assertNotNull(response.getBody());
     }
 
     @Test

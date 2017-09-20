@@ -34,5 +34,7 @@ public class P1_PlatformRegistry {
             log.error(e.getMessage());
             log.error(e.getCause());
         }
+
+        log.info("Platform owners and platforms registration done");
     }
 }

@@ -24,5 +24,7 @@ public class P3_UserRegistry {
             log.error(e.getMessage());
             log.error(e.getCause());
         }
+
+        log.info("User registration done");
     }
 }
