@@ -73,6 +73,7 @@ public class P1_PlatformsRegistrationInCoreAAM {
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
         log.info("platform registration done");
+        connection.close();
         return platformRegistrationOverAMQPResponse;
     }
 
@@ -102,6 +103,7 @@ public class P1_PlatformsRegistrationInCoreAAM {
 
         ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
         log.info("Platform owner registration done");
+        connection.close();
         return managementStatus;
     }
 }
