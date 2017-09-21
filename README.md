@@ -16,7 +16,7 @@ Currently available classes / functionalities are available:
 * P2_Platform1AAMKeyStoreGeneration - generates platform keyStore.   
 See:[CoreAAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-CORE ).
 KeyStore should be placed in platformAAM in main.resources. See:[Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1 ).  
-Generated _.p12_ file should be placed in COREAAM's `Resources` folder
+Generated _.p12_ file should be placed in PLATFORMAAM's `Resources` folder
 * P3_FederationInitialization - initializes federation in CoreAAM (removes existing one and adds new)
 ##### Following steps run on PLATFORMAAM 
 * P4_UserRegistrationInPlatform1 - registers test user in Platform1AAM database.
@@ -37,14 +37,14 @@ What's more, please clone git repositories containing CoreAAM and PlatformAAM:
 * [Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1)
 
 To run L2demo:
-1. Run Core Authentication and Authorization Manager and wait until a message that confirms it is up and running.
+1. Run Core Authentication and Authorization Manager and wait until a message that confirms it is up and running, port 8801
 It should be left running in the background.
 2. Run three steps from L2Demo associated with Core AAM Operations (as described in point above)
    1. P1_PlatformsRegistrationInCoreAAM  
    2. P2_Platform1AAMKeyStoreGeneration 
-      - After performing this step remember to move generated `.p12` file to COREAAM's `Resources` folder
+      - After performing this step remember to move generated `.p12` file to PLATFORMAAMS's `Resources` folder
    3. P3_FederationRegistration 
-3. Run Platform Authentication and Authorization Manager and wait until it is up and running. This one should be left running in the background as well.
+3. Run Platform Authentication and Authorization Manager and wait until it is up and running. This one should be left running in the background as well, port 8802
 4. Run remaining steps associated with Platform AAM Operations.
    1. P4_UserRegistrationInPlatform1
    2. P5_L2demoClient - it stops with message: "Waiting for federation update". Then P6 should be performed.
