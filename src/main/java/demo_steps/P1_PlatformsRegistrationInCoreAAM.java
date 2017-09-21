@@ -25,38 +25,42 @@ public class P1_PlatformsRegistrationInCoreAAM {
     public static void main(String[] args) throws
             IOException {
 
-
+        Connection connection = null;
         try {
+            connection =  getConnection(rabbitHost, rabbitUsername, rabbitPassword);
             registerPlatformOwner(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername, platformOwnerPassword, federatedId, recoveryMail,
-                    rabbitHost, rabbitUsername, rabbitPassword, userManagementRequestQueue);
+                    connection, userManagementRequestQueue);
 
             registerPlatformOwner(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername2, platformOwnerPassword2, federatedId2, recoveryMail2,
-                    rabbitHost, rabbitUsername, rabbitPassword, userManagementRequestQueue);
+                    connection, userManagementRequestQueue);
 
             registerPlatform(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername, platformOwnerPassword, platformInstanceFriendlyName,
-                    platformInterworkingInterfaceAddress, platformId, rabbitHost, rabbitUsername, rabbitPassword, platformManagementRequestQueue);
+                    platformInterworkingInterfaceAddress, platformId, connection, platformManagementRequestQueue);
 
             registerPlatform(AAMOwnerUsername, AAMOwnerPassword, platformOwnerUsername2, platformOwnerPassword2, platformInstanceFriendlyName2,
-                    platformInterworkingInterfaceAddress2, platformId2, rabbitHost, rabbitUsername, rabbitPassword, platformManagementRequestQueue);
+                    platformInterworkingInterfaceAddress2, platformId2, connection , platformManagementRequestQueue);
         } catch (IOException | TimeoutException e) {
             log.error(e.getMessage());
             log.error(e.getCause());
+        } finally{
+            if (connection!=null){
+                connection.close();
+            }
+
         }
     }
 
 
     private static PlatformManagementResponse registerPlatform(String AAMOwnerUsername, String AAMOwnerPassword, String platformOwnerUsername, String platformOwnerPassword,
                                                                String platformInstanceFriendlyName, String platformInterworkingInterfaceAddress, String platformId,
-                                                               String rabbitHost, String rabbitUsername, String rabbitPassword, String platformManagementRequestQueue) throws
+                                                               Connection connection, String platformManagementRequestQueue) throws
             IOException,
             TimeoutException {
-        Connection connection = null;
         RpcClient platformManagementOverAMQPClient = null;
         try {
-            connection = getConnection(rabbitHost, rabbitUsername, rabbitPassword);
             platformManagementOverAMQPClient = new RpcClient(connection.createChannel(), "",
                     platformManagementRequestQueue, 5000);
-        } catch (IOException | TimeoutException e) {
+        } catch (IOException e) {
             log.error("Failed to open connection.");
         }
 
@@ -66,7 +70,6 @@ public class P1_PlatformsRegistrationInCoreAAM {
 
         byte[] response = platformManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                 (platformManagementRequest).getBytes());
-        connection.close();
         if (response == null) {
             throw new SecurityException("Platform not registered.");
         }
@@ -74,23 +77,19 @@ public class P1_PlatformsRegistrationInCoreAAM {
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
         log.info("platform registration done");
-        connection.close();
         return platformRegistrationOverAMQPResponse;
     }
 
     private static ManagementStatus registerPlatformOwner(String AAMOwnerUsername, String AAMOwnerPassword, String platformOwnerUsername, String platformOwnerPassword,
-                                                          String federatedId, String recoveryMail, String rabbitHost, String rabbitUsername,
-                                                          String rabbitPassword, String userManagementRequestQueue) throws
+                                                          String federatedId, String recoveryMail, Connection connection, String userManagementRequestQueue) throws
             IOException,
             TimeoutException {
 
-        Connection connection = null;
         RpcClient userManagementOverAMQPClient = null;
         try {
-            connection = getConnection(rabbitHost, rabbitUsername, rabbitPassword);
             userManagementOverAMQPClient = new RpcClient(connection.createChannel(), "",
                     userManagementRequestQueue, 5000);
-        } catch (IOException | TimeoutException e) {
+        } catch (IOException e) {
             log.error("Failed to open connection.");
         }
 
@@ -104,7 +103,6 @@ public class P1_PlatformsRegistrationInCoreAAM {
 
         ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
         log.info("Platform owner registration done");
-        connection.close();
         return managementStatus;
     }
 }
