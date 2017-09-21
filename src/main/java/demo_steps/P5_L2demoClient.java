@@ -75,12 +75,10 @@ public class P5_L2demoClient {
         AAM coreAAM = clientSH.getCoreAAMInstance();
         AAM platform1 = clientSH.getAvailableAAMs().get(Constants.platformId);
 
-        //TODO change coreAAM to platform1
         clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId);
         Token token = clientSH.login(platform1);
 
         Set<AuthorizationCredentials> authorizationCredentialsSet = new HashSet<>();
-        //TODO check this
         authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
         SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
@@ -88,7 +86,6 @@ public class P5_L2demoClient {
         String rapKey = "rap";
         String rapComponentId = rapKey + "@" + Constants.platformId2;
         // generating the CSH
-        //TODO configure rapCSH
         IComponentSecurityHandler rapCSH = ComponentSecurityHandlerFactory.getComponentSecurityHandler(
                 Constants.coreAAMServerAddress,
                 Constants.KEY_STORE_PATH,
@@ -111,13 +108,11 @@ public class P5_L2demoClient {
         SingleTokenAccessPolicySpecifier testPolicySpecifier = new SingleTokenAccessPolicySpecifier(federationMembers, rapComponentId, Constants.federationId);
         testAP.put(goodResourceId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
-        //TODO change those ifs, they are stupid
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()) {
             log.error("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
             throw new SecurityException("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
         }
         log.info("SecurityRequest using Platform1 home token not passed Access Policy");
-        //TODO make pause after every operation (checking satisfied policies, generating foreignToken)
 
         //get foreign token from core aam using homeToken from platform 1
         List<AAM> aamList = new ArrayList<>();
@@ -147,9 +142,10 @@ public class P5_L2demoClient {
 
         log.info("Trying to access the resource again using the cached foreign token");
 
-        if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
-            log.info("SecurityRequest using federated token didn't pass Access Policy as the token was revoked");
-        } else
+        if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
             log.error("SecurityRequest using federated token passed Access Policy. It should NOT.");
+            throw new SecurityException("SecurityRequest using federated token passed Access Policy. It should NOT.");
+        }
+        log.info("SecurityRequest using federated token didn't pass Access Policy as the token was revoked");
     }
 }

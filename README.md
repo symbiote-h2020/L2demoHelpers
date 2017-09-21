@@ -32,7 +32,11 @@ Working CoreAAM and platform1AAM are required
 
 In order for the Demo to run it **It is _required_** to have 
 *Rabbit-MQ* server and *MongoDB* running in the background
+What's more, please clone git repositories containing CoreAAM and PlatformAAM:
+* [CoreAAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-CORE )
+* [Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1)
 
+To run L2demo:
 1. Run Core Authentication and Authorization Manager and wait until a message that confirms it is up and running.
 It should be left running in the background.
 2. Run three steps from L2Demo associated with Core AAM Operations (as described in point above)
