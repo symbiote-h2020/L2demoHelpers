@@ -17,15 +17,17 @@ Currently available classes / functionalities are available:
 See:[CoreAAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-CORE ).
 KeyStore should be placed in platformAAM in main.resources. See:[Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1 ).  
 Generated _.p12_ file should be placed in COREAAM's `Resources` folder
-* P3_FederationRegistration - registers federation in CoreAAM
+* P3_FederationInitialization - initializes federation in CoreAAM (removes existing one and adds new)
 ##### Following steps run on PLATFORMAAM 
-* P4_UserRegistrationInPlatform1
+* P4_UserRegistrationInPlatform1 - registers test user in Platform1AAM database.
   * **Prerequisite:** A running instance of `Platform1AAM`
 * P5_L2demoClient - acquires local home token from Platform1AAM
- and verify it against federation access policies in Platform2. 
+ and verify it against federation access policies in Platform2AAM. 
  Acquire federated token from CoreAAM and then 
- again check it against policies. 
+ again check it against policies.
+ Check it against policies after federation update.
 Working CoreAAM and platform1AAM are required
+* P6_FederationUpdate - updates federation in CoreAAM (removes existing one and adds new).
 ### Running the L2Demo
 
 In order for the Demo to run it **It is _required_** to have 
@@ -39,8 +41,10 @@ It should be left running in the background.
       - After performing this step remember to move generated `.p12` file to COREAAM's `Resources` folder
    3. P3_FederationRegistration 
 3. Run Platform Authentication and Authorization Manager and wait until it is up and running. This one should be left running in the background as well.
-4. Run two remaining steps associated with Platform AAM Operations.
+4. Run remaining steps associated with Platform AAM Operations.
    1. P4_UserRegistrationInPlatform1
-   2. P5_L2demoClient 
+   2. P5_L2demoClient - it stops with message: "Waiting for federation update". Then P6 should be performed.
+   3. P6_FederationUpdate
+   4. P5_L2demoClient should be continued passing any character to console.
 5. If performed correctly, follwing message should appear: 
-> SecurityRequest using federated token passed Access Policy.
+> SecurityRequest using federated token didn't pass Access Policy as the token was revoked

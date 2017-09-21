@@ -18,7 +18,7 @@ public class Constants {
     public static final String platformInstanceFriendlyName = "testPlatformInstanceFriendlyName";
     public static final String platformInterworkingInterfaceAddress = "https://localhost:8802";
 
-    public static final String platformId2 = "testPlatformId2";
+    public static final String platformId2 = "platform_2";
     public static final String platformInstanceFriendlyName2 = "testPlatformInstanceFriendlyName2";
     public static final String platformInterworkingInterfaceAddress2 = "https://localhost:8803";
 

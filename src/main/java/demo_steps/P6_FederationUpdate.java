@@ -67,6 +67,7 @@ public class P6_FederationUpdate {
         byte[] response = federationRuleManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                 (federationRuleManagementRequest).getBytes());
         log.info("Response from AAM acquired.");
+        connection.close();
         HashMap<String, FederationRule> responseMap = mapper.readValue(response, new TypeReference<HashMap<String, FederationRule>>() {
         });
         if (responseMap == null
@@ -74,11 +75,10 @@ public class P6_FederationUpdate {
             throw new SecurityException("Federation was not registered. Please, try again.");
         }
         log.info("Federation UPDATED.");
-        connection.close();
         return responseMap;
     }
 
-    static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws
+    private static Connection getConnection(String rabbitHost, String rabbitUsername, String rabbitPassword) throws
             IOException,
             TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();

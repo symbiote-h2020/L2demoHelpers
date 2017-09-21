@@ -21,9 +21,9 @@ import java.util.HashMap;
 
 import static helpers.Constants.*;
 
-public class P3_UserRegistrationInPlatform1 {
+public class P4_UserRegistrationInPlatform1 {
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        Log log = LogFactory.getLog(P3_UserRegistrationInPlatform1.class);
+        Log log = LogFactory.getLog(P4_UserRegistrationInPlatform1.class);
 
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {

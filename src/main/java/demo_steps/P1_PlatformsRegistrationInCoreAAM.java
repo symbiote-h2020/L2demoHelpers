@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
-import static demo_steps.P4_FederationRegistration.getConnection;
+import static demo_steps.P3_FederationInitialization.getConnection;
 import static helpers.Constants.*;
 
 public class P1_PlatformsRegistrationInCoreAAM {
@@ -66,6 +66,7 @@ public class P1_PlatformsRegistrationInCoreAAM {
 
         byte[] response = platformManagementOverAMQPClient.primitiveCall(mapper.writeValueAsString
                 (platformManagementRequest).getBytes());
+        connection.close();
         if (response == null) {
             throw new SecurityException("Platform not registered.");
         }
@@ -102,6 +103,7 @@ public class P1_PlatformsRegistrationInCoreAAM {
 
         ManagementStatus managementStatus = mapper.readValue(response, ManagementStatus.class);
         log.info("Platform owner registration done");
+        connection.close();
         return managementStatus;
     }
 }
