@@ -74,6 +74,7 @@ public class P1_PlatformsRegistrationInCoreAAM {
         PlatformManagementResponse platformRegistrationOverAMQPResponse = mapper.readValue(response,
                 PlatformManagementResponse.class);
         log.info("platform registration done");
+        connection.close();
         return platformRegistrationOverAMQPResponse;
     }
 
