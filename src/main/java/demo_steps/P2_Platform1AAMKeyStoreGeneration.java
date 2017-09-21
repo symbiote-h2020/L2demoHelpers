@@ -49,8 +49,7 @@ public class P2_Platform1AAMKeyStoreGeneration {
                 Constants.KEY_STORE_PATH,
                 Constants.KEY_STORE_PASSWORD,
                 Constants.rootCACertificateAlias,
-                Constants.aamCertificateAlias,
-                Constants.PV_KEY_PASSWORD);
+                Constants.aamCertificateAlias);
 
     }
 }
