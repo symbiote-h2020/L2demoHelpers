@@ -45,8 +45,8 @@ It should be left running in the background.
 3. Run Platform Authentication and Authorization Manager using e.g. gradle bootRun and wait until it is up and running. This one should be left running in the background as well, port 8802
 4. Run remaining steps associated with Platform AAM Operations.
    1. P4_UserRegistrationInPlatform1
-   2. P5_L2demoClient - it stops with message: "Waiting for federation update". Then P6 should be performed.
+   2. P5_L2demoClient - it stops with message: " Waiting for operator to update the federation". Then P6 should be performed.
    3. P6_FederationUpdate
    4. P5_L2demoClient should be continued passing any character to console.
 5. If performed correctly, follwing message should appear: 
-> SecurityRequest using federated token didn't pass Access Policy as the token was revoked
+> Access to federated resource using the cached FOREIGN token was denied as the token was revoked by the issuer due to platform1 no longer being in the federation
