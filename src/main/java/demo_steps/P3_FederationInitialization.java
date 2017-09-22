@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.RpcClient;
+import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.communication.payloads.Credentials;
 import eu.h2020.symbiote.security.communication.payloads.FederationRule;
 import eu.h2020.symbiote.security.communication.payloads.FederationRuleManagementRequest;
@@ -26,6 +27,7 @@ public class P3_FederationInitialization {
 
     public static void main(String[] args) {
         Set<String> platformsIds = new HashSet<>();
+        platformsIds.add(SecurityConstants.CORE_AAM_INSTANCE_ID);
         platformsIds.add(Constants.platformId);
         platformsIds.add(Constants.platformId2);
         try {

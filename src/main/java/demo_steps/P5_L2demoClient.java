@@ -65,7 +65,8 @@ public class P5_L2demoClient {
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         ECDSAHelper.enableECDSAProvider();
 
-        // generating the CSH
+        log.info("Initializing application security handler");
+        // generating the SH
         ISecurityHandler clientSH = ClientSecurityHandlerFactory.getSecurityHandler(
                 Constants.coreAAMServerAddress,
                 Constants.KEY_STORE_PATH,
@@ -75,7 +76,10 @@ public class P5_L2demoClient {
         AAM coreAAM = clientSH.getCoreAAMInstance();
         AAM platform1 = clientSH.getAvailableAAMs().get(Constants.platformId);
 
+
+        log.info("Acquiring application certificate");
         clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId);
+        log.info("Acquiring application HOME token from " + Constants.platformId);
         Token token = clientSH.login(platform1);
 
         Set<AuthorizationCredentials> authorizationCredentialsSet = new HashSet<>();
@@ -96,7 +100,7 @@ public class P5_L2demoClient {
                 Constants.platformOwnerUsername2,
                 Constants.platformOwnerPassword2
         );
-        //adding policy to platform 2
+        // adding policy to platform 2 'dummy' rap
         Map<String, IAccessPolicy> testAP = new HashMap<>();
         Set<String> federationMembers = new HashSet<>();
         federationMembers.add(Constants.platformId);
@@ -109,15 +113,17 @@ public class P5_L2demoClient {
         testAP.put(goodResourceId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()) {
-            log.error("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
-            throw new SecurityException("SecurityRequest using Platform1 home token passed Access Policy. It should not.");
+            String m = "Access to federated resource using Platform1 HOME token passed Access Policy. It should not.";
+            log.error(m);
+            System.exit(1);
         }
-        log.info("SecurityRequest using Platform1 home token not passed Access Policy");
+        log.info("Access to federated resource using Platform1 HOME token was rejected");
 
         //get foreign token from core aam using homeToken from platform 1
         List<AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
 
+        log.info("Attempting to acquire FOREIGN token from Core AAM");
         Map<AAM, Token> foreignTokens = new HashMap<>();
         try {
             foreignTokens = clientSH.login(aamList, token.toString());
@@ -132,20 +138,21 @@ public class P5_L2demoClient {
         SecurityRequest federatedSecurityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
         if (rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
-            log.error("SecurityRequest using federated token didn't pass Access Policy. It should.");
-            throw new SecurityException("SecurityRequest using federated token didn't pass Access Policy. It should.");
+            String m = "Access to federated resource using FOREIGN token from CoreAAM didn't pass Access Policy. It should.";
+            log.error(m);
+            System.exit(1);
         }
-        log.info("SecurityRequest using federated token passed Access Policy.");
+        log.info("Access to federated resource using FOREIGN token from CoreAAM was GRANTED");
 
-        log.info("Waiting for federation update");
+        log.info("Waiting for operator to update the federation");
         System.in.read();
 
         log.info("Trying to access the resource again using the cached foreign token");
 
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
-            log.error("SecurityRequest using federated token passed Access Policy. It should NOT.");
-            throw new SecurityException("SecurityRequest using federated token passed Access Policy. It should NOT.");
+            log.error("Access to federated resource using the cached FOREIGN token from CoreAAM was GRANTED. It should not.");
+            System.exit(1);
         }
-        log.info("SecurityRequest using federated token didn't pass Access Policy as the token was revoked");
+        log.info("Access to federated resource using the cached FOREIGN token was denied as the token was revoked by the issuer due to platform1 no longer being in the federation");
     }
 }
