@@ -99,13 +99,13 @@ public class P5_L2demoClient {
         //adding policy to platform 2
         Map<String, IAccessPolicy> testAP = new HashMap<>();
         Set<String> federationMembers = new HashSet<>();
-        federationMembers.add(platform1.getAamInstanceId());
-        federationMembers.add(rapComponentId);
+        federationMembers.add(Constants.platformId);
+        federationMembers.add(Constants.platformId2);
         // for the demo the core is also in federation as the arbiter
         federationMembers.add(SecurityConstants.CORE_AAM_INSTANCE_ID);
         String goodResourceId = "resourceId";
 
-        SingleTokenAccessPolicySpecifier testPolicySpecifier = new SingleTokenAccessPolicySpecifier(federationMembers, rapComponentId, Constants.federationId);
+        SingleTokenAccessPolicySpecifier testPolicySpecifier = new SingleTokenAccessPolicySpecifier(federationMembers, Constants.platformId2, Constants.federationId);
         testAP.put(goodResourceId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()) {
