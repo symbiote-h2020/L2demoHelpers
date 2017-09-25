@@ -5,6 +5,7 @@ import eu.h2020.symbiote.security.ComponentSecurityHandlerFactory;
 import eu.h2020.symbiote.security.accesspolicies.IAccessPolicy;
 import eu.h2020.symbiote.security.accesspolicies.common.SingleTokenAccessPolicyFactory;
 import eu.h2020.symbiote.security.accesspolicies.common.singletoken.SingleTokenAccessPolicySpecifier;
+import eu.h2020.symbiote.security.commons.Certificate;
 import eu.h2020.symbiote.security.commons.SecurityConstants;
 import eu.h2020.symbiote.security.commons.Token;
 import eu.h2020.symbiote.security.commons.credentials.AuthorizationCredentials;
@@ -76,15 +77,11 @@ public class P5_L2demoClient {
         AAM coreAAM = clientSH.getCoreAAMInstance();
         AAM platform1 = clientSH.getAvailableAAMs().get(Constants.platformId);
 
-
         log.info("Acquiring application certificate");
-        clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId);
+        Certificate test1 = clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId);
         log.info("Acquiring application HOME token from " + Constants.platformId);
         Token token = clientSH.login(platform1);
 
-        Set<AuthorizationCredentials> authorizationCredentialsSet = new HashSet<>();
-        authorizationCredentialsSet.add(new AuthorizationCredentials(token, platform1, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
-        SecurityRequest securityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
         //rap platform
         String rapKey = "rap";
@@ -112,13 +109,6 @@ public class P5_L2demoClient {
         SingleTokenAccessPolicySpecifier testPolicySpecifier = new SingleTokenAccessPolicySpecifier(federationMembers, Constants.platformId2, Constants.federationId);
         testAP.put(goodResourceId, SingleTokenAccessPolicyFactory.getSingleTokenAccessPolicy(testPolicySpecifier));
 
-        if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, securityRequest).isEmpty()) {
-            String m = "Access to federated resource using Platform1 HOME token passed Access Policy. It should not.";
-            log.error(m);
-            System.exit(1);
-        }
-        log.info("Access to federated resource using Platform1 HOME token was rejected");
-
         //get foreign token from core aam using homeToken from platform 1
         List<AAM> aamList = new ArrayList<>();
         aamList.add(coreAAM);
@@ -133,7 +123,7 @@ public class P5_L2demoClient {
             System.exit(1);
         }
 
-        authorizationCredentialsSet = new HashSet<>();
+        Set<AuthorizationCredentials> authorizationCredentialsSet = new HashSet<>();
         authorizationCredentialsSet.add(new AuthorizationCredentials(foreignTokens.get(coreAAM), coreAAM, clientSH.getAcquiredCredentials().get(platform1.getAamInstanceId()).homeCredentials));
         SecurityRequest federatedSecurityRequest = MutualAuthenticationHelper.getSecurityRequest(authorizationCredentialsSet, false);
 
@@ -144,15 +134,35 @@ public class P5_L2demoClient {
         }
         log.info("Access to federated resource using FOREIGN token from CoreAAM was GRANTED");
 
-        log.info("Waiting for operator to update the federation");
-        System.in.read();
+        clientSH.getCertificate(platform1, Constants.username, Constants.password, Constants.userId);
 
-        log.info("Trying to access the resource again using the cached foreign token");
+        log.info("Trying to access the resource again with client new certificate in database");
 
         if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
-            log.error("Access to federated resource using the cached FOREIGN token from CoreAAM was GRANTED. It should not.");
+            log.error("Access to federated resource by client with new certificate in platform database was granted. IT SHOULD NOT.");
             System.exit(1);
         }
-        log.info("Access to federated resource using the cached FOREIGN token was denied as the token was revoked by the issuer due to platform1 no longer being in the federation");
+        log.info("Access to federated resource using the cached FOREIGN token was denied as the client certificate in platform1 was changed");
+
+        log.info("Waiting for user update. Please, run P6.");
+        System.in.read();
+
+        if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
+            log.error("Access to federated resource by user deleted from platform database was granted. IT SHOULD NOT.");
+            System.exit(1);
+        }
+        log.info("Access to federated resource using the cached FOREIGN token was denied as the user was deleted from platform database");
+
+        log.info("Waiting for user update. Please, run P7.");
+        System.in.read();
+
+        if (!rapCSH.getSatisfiedPoliciesIdentifiers(testAP, federatedSecurityRequest).isEmpty()) {
+            log.error("Access to federated resource by client not registered in platform database was granted. IT SHOULD NOT.");
+            System.exit(1);
+        }
+        log.info("Access to federated resource using the cached FOREIGN token was denied as the client doesn't exist in platform1");
+
+
+
     }
 }
