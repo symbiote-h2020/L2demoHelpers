@@ -34,19 +34,39 @@ What's more, please clone git repositories containing CoreAAM and PlatformAAM:
 * [CoreAAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-CORE )
 * [Platform1AAM](https://github.com/symbiote-h2020/AuthenticationAuthorizationManager/tree/L2-demo-PLATFORM1)
 
-To run L2demo:
-1. Run Core Authentication and Authorization Manager using e.g. gradle bootRun command and wait until a message that confirms it is up and running, port 8801
-It should be left running in the background.
-2. Run three steps from L2Demo associated with Core AAM Operations (as described in point above)
-   1. P1_PlatformsRegistrationInCoreAAM  
-   2. P2_Platform1AAMKeyStoreGeneration 
-      - After performing this step remember to move generated `platform_1.p12` file to PLATFORMAAMS's `src/main/resources` folder
-   3. P3_FederationRegistration 
-3. Run Platform Authentication and Authorization Manager using e.g. gradle bootRun and wait until it is up and running. This one should be left running in the background as well, port 8802
-4. Run remaining steps associated with Platform AAM Operations.
-   1. P4_UserRegistrationInPlatform1
-   2. P5_L2demoClient - it stops with message: " Waiting for operator to update the federation". Then P6 should be performed.
-   3. P6_FederationUpdate
-   4. P5_L2demoClient should be continued passing any character to console.
-5. If performed correctly, follwing message should appear: 
-> Access to federated resource using the cached FOREIGN token was denied as the token was revoked by the issuer due to platform1 no longer being in the federation
+#### Setting up the demo:
+1. Delete the *symbiote-aam-tests-database* and *symbiote-platform-aam-tests-database*
+2. Run Core Authentication and Authorization Manager using *gradle bootRun* command and wait until there is a message that confirms it is up and running at port 8801. It should be left running in the background.
+3. Register the platform in Core AAM (i.e. *P1_PlatformsRegistrationInCoreAAM*)
+4. Generate the platform keystore (i.e. *P2_Platform1AAMKeyStoreGeneration*).  
+5. Move generated `platform_1.p12` file to PLATFORMAAMS's `src/main/resources` folder
+6. Run the Platform AAM use using *gradle bootRun* and wait until there is a message that confirms it is up and running at port 8802. It should be left running in the background.
+
+#### Access the resource without registering to the PAAM
+1. Run *P5_L2demoClient*. It stops with message: *"USER_NOT_REGISTERED_IN_REPOSITORY"*, which showcases that you cannot access resources without an account in the PAAM
+
+#### Registered user tries to access without federation creation
+1. Register a user in PAAM by running *P4_UserRegistrationInPlatform1*. 
+2. Run *P5_L2demoClient*.  
+    - Access with ***HOME TOKEN*** fails
+    - ***FOREIGN TOKEN*** cannot be acquired without federation creation
+
+#### Registered user tries to access after federation creation
+1. Create the federation by running *P3_FederationRegistration*. 
+2. Run *P5_L2demoClient*.  
+    - Access with ***HOME TOKEN*** fails
+    - ***FOREIGN TOKEN*** is acquired and access to the resource is successful
+    - Press enter to continue the *L2DemoClient*. It stops with message: *"Access to federated resource using the cached FOREIGN token from CoreAAM was GRANTED. It should not."*
+    
+#### Registered user tries to access after federation deletion
+1. Run *P5_L2demoClient*.  
+    - Access with ***HOME TOKEN*** fails
+    - ***FOREIGN TOKEN*** is acquired and access to the resource is successful
+2. Delete the federation by running *P6_FederationUpdate*
+3. Press enter to continue the *L2DemoClient*. It stops with message: *"Access to federated resource using the cached FOREIGN token was denied as the token was revoked by the issuer due to platform1 no longer being in the federation"*
+  
+#### Registered user tries to access after federation deletion again
+1. Register a user in PAAM by running *P4_UserRegistrationInPlatform1*. 
+2. Run *P5_L2demoClient*.  
+    - Access with ***HOME TOKEN*** fails
+    - ***FOREIGN TOKEN*** cannot be acquired without federation creation
