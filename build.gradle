@@ -1,51 +1,46 @@
-// new plugins syntax
-plugins {
-    // code
-    id "java"
-    // spring
-    id "io.spring.dependency-management" version "1.0.3.RELEASE"
-    id 'org.springframework.boot' version '1.5.7.RELEASE'
-    // IDEs
-    id "eclipse"
-    id "idea"
+buildscript {
+    ext {
+        springBootVersion = '1.5.7.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
-// dependencies section
+plugins {
+    id 'java'
+    id 'idea'
+    id 'org.springframework.boot' version '1.5.7.RELEASE'
+}
+group = 'eu.h2020.symbiote.security'
+sourceCompatibility = 1.8
+
 repositories {
     mavenCentral()
-    jcenter()
-    maven { url "https://jitpack.io" }
 }
 
-/*
-Forces dependencies' cache invalidation for each build for dependencies marked with
-    { changing = true }
-    e.g.
-    compile('com.github.symbiote-h2020:SymbIoTeSecurity:develop-SNAPSHOT'){ changing = true }
- */
-configurations.all {
-    // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+
+ext {
+    springCloudVersion = 'Dalston.SR4'
 }
 
 dependencies {
-    /* SymbIoTeSecurity manual:
-        One can use the library from jitpack by default with the notation:
-            compile('com.github.symbiote-h2020:SymbIoTeSecurity:develop-SNAPSHOT') {changing = true }
-        or having cloned locally the SymbIoTeLibraries repo use it directly with project dependency by:
-            compile project(':SymbIoTeSecurity')
-        Important --- In order to use the latter you need to:
-            1) switch comments on the artifact and project dependencies
-            2) always have only one uncommented
-            3) project dependency requires changes in settings.gradle file in this project
-            4) never commit build.gradle which has project dependencies active as it will break CI builds
-    */
-    compile('com.github.symbiote-h2020:SymbIoTeSecurity:21.3.5'){ changing = true }
-    // allows to select the downloaded matching sources in IntelliJ Idea as it fails to do so automatically from jitpack repo
-    compile('com.github.symbiote-h2020:SymbIoTeSecurity:21.3.5:sources'){ changing = true }
-    //compile project(':SymbIoTeSecurity')
+    compile project(':SymbIoTeSecurity')
+    compile project(':AnomaliesListenerExtension')
 
+    compile('org.springframework.cloud:spring-cloud-starter')
     compile('org.springframework.boot:spring-boot-starter-amqp')
+    compile('org.springframework.boot:spring-boot-starter-web')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
+
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
